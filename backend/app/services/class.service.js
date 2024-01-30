@@ -1,0 +1,246 @@
+const { ObjectId } = require("mongodb");
+
+class GroupService {
+  constructor(databaseSetvices) {
+    this.databaseSetvices = databaseSetvices;
+  }
+  extractGroupData(group) {
+    const _group = { ...group };
+
+    // Remove undifined fileds
+    Object.keys(_group).forEach(
+      (key) => _group[key] === undefined && delete _group[key]
+    );
+    return _group;
+  }
+  
+  async create(data) {
+    const group = this.extractGroupData(data);
+    const result = await this.databaseSetvices.class.findOneAndUpdate(
+      group,
+      {
+        $set: { },
+      },
+      {
+        upsert: true,
+        returnDocument: "after",
+      }
+    );
+    return result;
+  }
+
+  async createSchedule(data) {
+    const group = this.extractGroupData(data);
+    const result = await this.databaseSetvices.schedule.findOneAndUpdate(
+      group,
+      {
+        $set: { },
+      },
+      {
+        upsert: true,
+        returnDocument: "after",
+      }
+    );
+    return result;
+  }
+
+  async findAllPaged(page, limit) {
+    try {
+      const skip = (page - 1) * limit;
+      const groups = await this.databaseSetvices.class.find().skip(skip).limit(limit).toArray();
+      return groups;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  
+  async findByCourseId(courseid) {
+    try {
+      const group = await this.databaseSetvices.class.find({
+        courseid: courseid,
+      }).toArray();
+      return group;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async findByIdtoArray(data) {
+    try {
+      const group = await this.databaseSetvices.class.find({
+        courseid: courseid,
+      }).toArray();
+      return group;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  
+  async findByNamePaged(name, page, limit) {
+    try {
+      const skip = (page - 1) * limit;
+      const groups = await this.databaseSetvices.class
+        .find({
+          name: {
+            $regex: new RegExp(name),
+            $options: "i",
+          },
+        })
+        .skip(skip)
+        .limit(limit)
+        .toArray();
+      return groups;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  
+  async findByCategoryPaged(category, page, limit) {
+    try {
+      const skip = (page - 1) * limit;
+      const groups = await this.databaseSetvices.class
+        .find({
+          category: category,
+        })
+        .skip(skip)
+        .limit(limit)
+        .toArray();
+      return groups;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  
+  async findByNameAndCategoryPaged(name, category, page, limit) {
+    try {
+      const skip = (page - 1) * limit;
+      const groups = await this.databaseSetvices.class
+        .find({
+          name: {
+            $regex: new RegExp(name),
+            $options: "i",
+          },
+          category: category,
+        })
+        .skip(skip)
+        .limit(limit)
+        .toArray();
+      return groups;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async findBySlug(slug) {
+    try {
+      const group = await this.databaseSetvices.class.findOne({
+        slug: slug,
+      });
+      return group;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  
+  async findById(id) {
+    try {
+      const group = await this.databaseSetvices.class.findOne({
+        _id: new ObjectId(id),
+      });
+      if (!group) {
+        return null;
+      }
+      return group; 
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  
+  async findByname(name) {
+    try {
+      const group = await this.databaseSetvices.class.findOne({
+        tenlop: name,
+      });
+      return group;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async update(id, updateGroup) {
+    const filter ={
+      _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
+    }
+    const update = this.extractGroupData(updateGroup);
+    const options = {
+      returnDocument: "after",
+    };
+    try {
+      const group = await this.databaseSetvices.class.findOneAndUpdate(
+        filter,
+        {
+          $set: update,
+        },
+        options
+      );
+      return group;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async updateSchedule(id, updateGroup) {
+    const filter ={
+      _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
+    }
+    const update = this.extractGroupData(updateGroup);
+    const options = {
+      returnDocument: "after",
+    };
+
+    try {
+      const group = await this.databaseSetvices.schedule.findOneAndUpdate(
+        filter,
+        {
+          $set: update,
+        },
+        options
+      );
+      return group;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async deleteOne(id) {
+    try {
+      const group = await this.databaseSetvices.class.findOneAndDelete({
+        _id: new ObjectId(id),
+      });
+      return group;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async deleteAll() {
+    try {
+      const groups = await this.databaseSetvices.class.deleteMany();
+      return groups;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async addClass() {
+    const filter ={
+      _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
+    }
+    try {
+      const groups = await this.databaseSetvices.class.findOneAndUpdate();
+      return groups;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+}
+const databaseSetvices = require("../utils/mongodb.util");
+const groupService = new GroupService(databaseSetvices);
+module.exports = groupService;
