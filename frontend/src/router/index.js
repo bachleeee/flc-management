@@ -7,7 +7,8 @@ import Order from '@/views/Order.vue';
 import Intro from '@/views/Intro.vue';
 import CourseDetail from '@/views/CourseDetail.vue'
 import SignUpClass from '@/views/SignUpClass.vue'
-import MyClassList from '@/views/MyClassList.vue'
+import MyClass from '@/views/MyClass.vue'
+import LessonDetail from '@/views/LessonDetail.vue'
 
 const routes = [
     {
@@ -28,7 +29,7 @@ const routes = [
         component: Login,
     },
     {
-        path: "/signup",
+        path: "/sign-up",
         name: "Signup",
         component: Signup,
     },
@@ -48,9 +49,14 @@ const routes = [
         component: SignUpClass,
     },
     {
-        path: "/my-class-list",
-        name: "MyClassList",
-        component: MyClassList,
+        path: "/my-class/:className",
+        name: "MyClass",
+        component: MyClass,
+    },
+    {
+        path: "/:lessonName",
+        name: "LessonDetail",
+        component: LessonDetail,
     },
 ];
 const router = createRouter({

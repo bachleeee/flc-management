@@ -6,7 +6,7 @@ class ClassService {
     async getClassByCourse(id) {
         return (await this.api.get(`/course/${id}`)).data;
     }
-    async getClass() {
+    async getAllClass() {
         return (await this.api.get(`/`)).data;
     }
     async getClassByIdtoArray(id) {

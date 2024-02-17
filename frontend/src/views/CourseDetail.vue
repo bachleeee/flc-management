@@ -27,8 +27,8 @@
             <tbody>
               <tr v-for="(myClass, index) in classes" :key="index">
                 <td>{{ myClass.tenlop }}</td>
-                <td>{{ myClass.thu }}</td>
-                <td>{{ myClass.ngaybatdau }}</td>
+                <td>Thứ {{ formattedDays(myClass.thu) }}</td>
+                <td>{{ formatDate(myClass.ngaybatdau) }}</td>
                 <td>{{ myClass.sobuoihoc }}</td>
                 <td>{{ myClass.siso }} / {{ myClass.soluong }}</td>
                 <td>
@@ -103,7 +103,22 @@ export default {
         console.error('Error fetching Class ', error);
       }
     },
-    
+    formattedDays(days) {
+      const daysOfWeek = ['Chủ nhật', 'hai', 'ba', 'tư', 'năm', 'sáu', 'bảy'];
+      const selectedDays = days.map(day => daysOfWeek[day]);
+      return selectedDays.join(', ');
+    },
+    formatDate(timestamp) {
+      const date = new Date(timestamp);
+      const day = date.getDate();
+      const month = date.getMonth() + 1; 
+      const year = date.getFullYear();
+
+      const formattedDay = day.toString().padStart(2, '0');
+      const formattedMonth = month.toString().padStart(2, '0');
+
+      return `${formattedDay}/${formattedMonth}/${year}`;
+    },
     async addToCart() {
       try {
         const cookieValue = Cookies.get('token');

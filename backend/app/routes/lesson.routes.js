@@ -16,7 +16,8 @@ const {
   deleteVid,
   createExcercise,
   submitExcercise,
-  findOneEx
+  findOneEx,
+  getLessonByCourse
 } = require("../controllers/lesson.controller");
 
 const router = express.Router();
@@ -37,5 +38,7 @@ router.route("/excercise/:id([0-9a-fA-F]{24})").get(findOneEx).put(updateVid).de
 router.route("/excercise/:id([0-9a-fA-F]{24})").post(authenticateToken,submitExcercise)
 
 router.route('/:slug').get(findOneBySlug)
+
+router.route("/course/:id([0-9a-fA-F]{24})").get(getLessonByCourse)
 
 module.exports = router;

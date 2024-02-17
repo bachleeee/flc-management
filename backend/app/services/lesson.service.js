@@ -283,6 +283,16 @@ class GroupService {
       throw new Error(error);
     }
   }
+  async findByCourseId(courseid) {
+    try {
+      const group = await this.databaseSetvices.lesson.find({
+        courseid: courseid,
+      }).toArray();
+      return group;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 }
 const databaseSetvices = require("../utils/mongodb.util");
 const groupService = new GroupService(databaseSetvices);

@@ -109,37 +109,6 @@ class UserService {
       throw new Error(error);
     }
   }
-  async addToClass(userId, classId, courseId) {
-    const filter = {
-        _id: ObjectId.isValid(userId) ? new ObjectId(userId) : null,
-    };
-
-    const update = {
-        $push: {
-            myclass: {
-                classid: classId,
-                courseid: courseId
-            },
-        },
-    };
-
-    const options = {
-        returnDocument: 'after',
-    };
-
-    try {
-        const updatedUser = await this.databaseSetvices.users.findOneAndUpdate(
-            filter,
-            update,
-            options
-        );
-        return updatedUser;
-    } catch (error) {
-        throw new Error(error);
-    }
-}
-
-
   
   async deleteOne(id) {
     try {

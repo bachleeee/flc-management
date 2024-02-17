@@ -39,14 +39,14 @@
           <li class="nav-link">Liên hệ</li>
         </router-link>
         <li class="nav-link dropdown" style="background-color: rgb(222, 34, 34);">
-          <span>Khóa học của bạn</span>
-          <div class="menu-dropdown" >
+          <span>Lớp học của bạn</span>
+          <div class="menu-dropdown">
             <div class="row">
               <ul style="padding: 12px 15px;">
-                <li v-for="(cat, index) in cats" :key="index" class="sub-menu">
-                  <span>{{ cat.name }}</span>
-                  
-                </li>
+                <router-link :to="{ name: 'MyClass', params: { className: classItem.tenlop}}" v-for="(classItem, index) in myClass" :key="index">
+
+                  <span>{{ classItem.tenlop }}</span>
+                </router-link>
               </ul>
             </div>
           </div>
@@ -58,13 +58,23 @@
   
 <script>
 import CourseService from "@/service/course.service";
+import ClassService from "@/service/class.service";
+import { useAuthStore } from '@/store/auth';
 
 export default {
   data() {
     return {
       cats: [],
-      courses: []
+      courses: [],
+      classes: [],
+      myCourse: [],
+      myClass: []
     };
+  },
+  computed: {
+    authStore() {
+      return useAuthStore();
+    },
   },
   methods: {
     async getCategory() {
@@ -77,6 +87,25 @@ export default {
     async getCourse() {
       try {
         this.courses = await CourseService.getAllCourse();
+        console.log("Danh sach khoa hoc", this.courses)
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách khóa học:", error);
+      }
+    },
+    async getClass() {
+      try {
+        this.classes = await ClassService.getAllClass();
+        console.log("Danh sach lop hoc", this.classes)
+
+        const userId = this.authStore.user._id;
+
+        for (const classItem of this.classes) {
+          if (classItem.students && classItem.students.includes(userId)) {
+            this.myClass.push(classItem);
+          }
+        }
+        
+        console.log("lớp học của bạn ", this.myClass);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách khóa học:", error);
       }
@@ -85,6 +114,7 @@ export default {
   mounted() {
     this.getCategory();
     this.getCourse();
+    this.getClass();
   },
 };
 </script>

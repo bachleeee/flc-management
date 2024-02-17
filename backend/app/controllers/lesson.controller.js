@@ -1,9 +1,15 @@
 const ApiError = require("../api-error");
 const groupService = require("../services/lesson.service");
+const { convertToSlug } = require('../utils/createSlug');
 
 exports.createLesson = async (req, res, next) => {
     try {
-        result = await groupService.create(req.body);
+        const slug = convertToSlug(req.body.name);
+        const productData = {
+            ...req.body,
+            slug,
+        };
+        const result = await groupService.create(productData);
         res.send(result);
     } catch (error) {
         next(new ApiError("Lỗi tạo bài học", 500));
@@ -109,6 +115,16 @@ exports.findAll = async (req, res, next) => {
     return res.send(documents);
 };
 
+exports.getLessonByCourse = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        let documents = [];
+        documents = await groupService.findByCourseId(id);
+        return res.send(documents);
+    } catch (error) {
+        next(new ApiError(`An error accurred while retrieving class ${id}`, 500));
+    }
+};
 
 exports.findOneBySlug = async (req, res, next) => {
     const { slug } = req.params;
@@ -240,4 +256,3 @@ exports.deleteAllLessons = async (req, res, next) => {
         next(new ApiError("An error accurred while deleting groups", 500));
     }
 };
-

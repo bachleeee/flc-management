@@ -250,10 +250,7 @@ exports.deleteAllClass = async (req, res, next) => {
 exports.addToClass = async (req, res, next) => {
   const {userid, classid} = req.body
   try {
-    let getClass = await classService.findById(classid);
-    let getCourse = await productService.findById(getClass.courseid);
-
-    result = await userService.addToClass(userid, classid,getCourse._id)
+    result = await classService.addToClass(userid, classid)
     return res.send(result);
   } catch (error) {
     next(new ApiError("Lỗi khi thêm lớp học", 500));

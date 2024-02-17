@@ -64,6 +64,7 @@ class GroupService {
       throw new Error(error);
     }
   }
+  
   async findByIdtoArray(data) {
     try {
       const group = await this.databaseSetvices.class.find({
@@ -229,17 +230,35 @@ class GroupService {
       throw new Error(error);
     }
   }
-  async addClass() {
-    const filter ={
-      _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
-    }
+  
+  async addToClass(userId, classId) {
+    const filter = {
+      _id: new ObjectId(classId),
+    };
+  
+    const update = {
+      $addToSet: {
+        students: userId,
+      },
+    };
+  
+    const options = {
+      returnDocument: 'after',
+    };
+  
     try {
-      const groups = await this.databaseSetvices.class.findOneAndUpdate();
-      return groups;
+      const updatedClass = await this.databaseSetvices.class.findOneAndUpdate(
+        filter,
+        update,
+        options
+      );
+      return updatedClass;
     } catch (error) {
       throw new Error(error);
     }
   }
+  
+  
 }
 const databaseSetvices = require("../utils/mongodb.util");
 const groupService = new GroupService(databaseSetvices);
