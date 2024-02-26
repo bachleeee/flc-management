@@ -2,8 +2,9 @@ const ApiError = require("../api-error");
 const commentService = require("../services/comment.service");
 
 exports.createComment = async (req, res, next) => {
-  const { userid } = req.user;
+  const {id} = req.user;
   try {
+    const userid = id;
     const _data = {
       ...req.body,
       userid,
@@ -11,7 +12,7 @@ exports.createComment = async (req, res, next) => {
     };
 
     const result = await commentService.createComment(_data);
-    res.send(result);
+    return res.send(result);
   } catch (error) {
     next(new ApiError("Lỗi tạo bình luận", 500));
   }

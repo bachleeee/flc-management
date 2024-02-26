@@ -1,30 +1,68 @@
 <template>
-  <div class="container">
-    <div class="row">
-      <div class="col-6">
-
-      </div>
-      <div class="col-5">
-        <div v-if="lesson.length > 0">
-          <h4>Danh sách bài học</h4>
-          <ul class="lesson-list">
-            <router-link v-for="(lessonItem, index) in lesson" :key="index"
-              :to="{ name: 'LessonDetail', params: { lessonName: lessonItem.slug } }">
-              <li class="lesson-item">
-                <div class="lesson-header">
-                  <span class="lesson-number">Bài học {{ index + 1 }}:</span>
-                  <strong class="lesson-name">{{ lessonItem.name }}</strong>
+  <div class="container-xxl">
+    <div class="container">
+      <h3 class="p-4 d-flex justify-content-center" style="color: blue;">Chào mừng đến với lớp học</h3>
+      <div class="row">
+        <div class="col-6">
+          <div class="px-4">
+            <div class="bg-white p-4">
+              <div class="d-flex flex-column mb-4 align-items-center">
+                <h3 style="color: blue;">{{ myCourse.name }}</h3>
+                <p>{{ myCourse.target }}</p>
+                <p>{{ lesson.length }} Bài học</p>
+              </div>
+              <div class="d-flex flex-wrap">
+                <div v-for="(lessonItem, index) in lesson" :key="index">
+                  <div class="list-lesson justify-content-center">
+                    <img class="hexagon" :src="getLessonImg(lessonItem._id)" alt="">
+                    <span class="lesson-number">{{ index + 1 }}</span>
+                  </div>
                 </div>
-              </li>
-            </router-link>
-          </ul>
+              </div>
+              <div class="d-flex align-items-center note-list pt-5">
+                <div class="d-flex note">
+                  <img src="../assets/img/myclass/default.png" alt="" style="height: 27px;">
+                  <p>Chưa học</p>
+                </div>
+                <div class="d-flex note pl-5">
+                  <img src="../assets/img/myclass/inProgress.png" alt="" style="height: 27px;">
+                  <p>Đang học</p>
+                </div>
+                <div class="d-flex note pl-5">
+                  <img src="../assets/img/myclass/completed.png" alt="" style="height: 27px;">
+                  <p>Đã hoàn thành</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div v-else>
-          <p>Không có bài học nào cho khóa học này.</p>
+        <div class="col-5">
+          <div class="pl-5">
+            <div v-if="lesson.length > 0">
+              <ul class="lesson-list">
+                <router-link v-for="(lessonItem, index) in lesson" :key="index"
+                  :to="{ name: 'LessonDetail', params: { lessonName: lessonItem.slug } }"
+                  @click="createProgress(lessonItem._id)">
+                  <li class="lesson-item row align-items-center">
+                    <div class="lesson-header justify-content-center">
+                      <img class="hexagon" :src="getLessonImg(lessonItem._id)" alt="">
+                      <span class="lesson-number">{{ index + 1 }}</span>
+                    </div>
+                    <div class="d-flex flex-column">
+                      <strong class="course-name">{{ myCourse.name }}</strong>
+                      <strong class="lesson-name">{{ lessonItem.name }}</strong>
+                    </div>
+                  </li>
+                </router-link>
+              </ul>
+            </div>
+            <div v-else>
+              <p>Không có bài học nào cho khóa học này.</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -32,19 +70,26 @@
 import CourseService from "@/service/course.service";
 import ClassService from "@/service/class.service";
 import LessonService from "@/service/lesson.service";
+import ProgressService from "@/service/progress.service";
 import { useAuthStore } from '@/store/auth';
+import Cookies from 'js-cookie';
 
 export default {
   data() {
     return {
       myCourse: null,
       myClass: null,
-      lesson: []
+      lesson: [],
+      myProgress: [],
     };
   },
   computed: {
     authStore() {
       return useAuthStore();
+    },
+    extendedLesson() {
+      const repetitionCount = 10;
+      return Array.from({ length: repetitionCount }, () => this.lesson).flat();
     },
   },
   methods: {
@@ -61,13 +106,14 @@ export default {
         }
 
         if (this.myClass) {
-          const courid = this.myClass.courseid;
-          this.myCourse = await CourseService.getById(courid);
+          const courseid = this.myClass.courseid;
+          this.myCourse = await CourseService.getById(courseid);
 
           console.log("Lớp học của bạn:", this.myClass);
           console.log("Khóa học của bạn:", this.myCourse);
 
-          this.lesson = await LessonService.getLessonByCourse(courid);
+          const classid = this.myClass._id;
+          this.lesson = await LessonService.getLessonByClassId(classid);
 
           console.log("Danh sách bài học:", this.lesson);
         } else {
@@ -77,15 +123,78 @@ export default {
         console.error("Lỗi khi lấy danh sách lớp học:", error);
       }
     },
+    async getmyProgress() {
+      try {
+        const cookieValue = Cookies.get('token');
+        if (this.authStore.isLoggedIn) {
+          if (this.myClass) {
+            this.myProgress = await ProgressService.getMyProgress(cookieValue, this.myClass._id);
+            console.log("Tiến độ học tập của bạn:", this.myProgress);
+          } else {
+            console.error('Không có thông tin tiến độ.');
+          }
+        } else {
+          console.error('User is not logged in.');
+        }
+      } catch (error) {
+        console.error("Lỗi lấy tiến độ:", error);
+      }
+    },
+    getLessonImg(lessonId) {
+      if (this.myProgress) {
+        const progressItem = this.myProgress.find(item => item.lessonid === lessonId);
+        if (progressItem) {
+          switch (progressItem.status) {
+            case 'inprogress':
+              return "../src/assets/img/myclass/inProgress.png";
+            case 'completed':
+              return "../src/assets/img/myclass/completed.png";
+            default:
+              return "../src/assets/img/myclass/default.png";
+          }
+        }
+      }
+      return "../src/assets/img/myclass/default.png";
+    },
+    async createProgress(lessonId) {
+      try {
+        const cookieValue = Cookies.get('token');
+        const data = {
+          classid: this.myClass._id, 
+          lessonid: lessonId, 
+          status: "inprogress", 
+        };
+
+        if (this.authStore.isLoggedIn && this.myClass) {
+          await ProgressService.createProgress(cookieValue, data);
+          console.log("Tiến độ đã được tạo cho bài học có ID:", lessonId);
+        } else {
+          console.error('Không có thông tin tiến độ hoặc người dùng chưa đăng nhập.');
+        }
+      } catch (error) {
+        console.error("Lỗi khi tạo tiến độ:", error);
+      }
+    },
 
   },
   created() {
     this.getMyCourseAndMyClass();
   },
+  mounted() {
+    this.getmyProgress();
+  }
 };
 </script>
 
 <style scoped>
+a {
+  text-decoration: none;
+}
+
+.container-xxl {
+  background-color: #f0f7ff;
+}
+
 .lesson-list {
   list-style: none;
   padding: 0;
@@ -95,28 +204,58 @@ export default {
   margin-bottom: 20px;
   padding: 15px;
   border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: #f4992b;
+  border-radius: 15px;
+  background-color: #ffffff;
   transition: background-color 0.3s ease;
+  box-shadow: 4px 18px 15px #d4d4d4;
+
 }
 
 .lesson-item:hover {
-  background-color: #2560df;
+  background-color: #ffdea4;
+}
+
+.list-lesson {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
 }
 
 .lesson-header {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  position: relative;
 }
 
 .lesson-number {
-  font-size: 16px;
-  color: #333;
-  margin-right: 10px;
+  font-size: 20px;
+  color: #ffffff;
+  z-index: 20;
+  position: absolute;
+  font-weight: 700;
 }
 
-.lesson-name,
-.lesson-number {
-  color: white;
+.hexagon {
+  width: 100%;
+  height: auto;
+}
+
+.lesson-name {
+  text-transform: uppercase;
+  color: rgb(0, 0, 0);
+}
+
+.course-name {
+  color: grey;
+  font-weight: normal;
+}
+
+.bg-white {
+  background-color: white;
+}
+
+.note-list {
+  padding-left: 10px;
 }
 </style>

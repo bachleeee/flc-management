@@ -4,33 +4,32 @@
       <div class="login-container py-5">
         <div v-if="!isLoggedIn">
           <form @submit.prevent="onSubmit">
-          <div class="d-flex justify-content-center pb-1">
-            <h4>Đăng nhập</h4>
-          </div>
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" v-model="email" placeholder="Nhập email">
-
-          </div>
-          <div class="form-group">
-            <label for="password">Mật khẩu</label>
-            <input type="password" class="form-control" id="password" v-model="password" placeholder="Nhập mật khẩu">
-          </div>
-          <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input" id="remember">
-            <label class="form-check-label" for="remember">Ghi nhớ</label>
-          </div>
-          <div class="d-flex justify-content-center">
-            <button type="submit" class="btn btn-dark">Login</button>
-          </div>
-          <!-- <div v-if="error" class="mt-2 text-danger">
+            <div class="d-flex justify-content-center pb-1">
+              <h4>Đăng nhập</h4>
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" class="form-control" id="email" v-model="email" placeholder="Nhập email">
+            </div>
+            <div class="form-group">
+              <label for="password">Mật khẩu</label>
+              <input type="password" class="form-control" id="password" v-model="password" placeholder="Nhập mật khẩu">
+            </div>
+            <div class="form-group form-check">
+              <input type="checkbox" class="form-check-input" id="remember">
+              <label class="form-check-label" for="remember">Ghi nhớ</label>
+            </div>
+            <div class="d-flex justify-content-center">
+              <button type="submit" class="btn btn-dark">Login</button>
+            </div>
+            <!-- <div v-if="error" class="mt-2 text-danger">
             {{ error }}
           </div> -->
-          <div class="mt-4">
-            <p>Nếu chưa có tài khoản, </p>
-          </div>
-          <router-link to="/signup">Đăng ký ngay</router-link>
-        </form> 
+            <div class="mt-4">
+              <p>Nếu chưa có tài khoản, </p>
+            </div>
+            <router-link to="/signup">Đăng ký ngay</router-link>
+          </form>
         </div>
         <div v-if="isLoggedIn">
           đăng nhập thành công
@@ -41,19 +40,19 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue';
-  import { useAuthStore } from '@/store/auth';
-  import router from '@/router/index.js';
-  
-  const email = ref('');
-  const password = ref('');
-  const { login,isLoggedIn } = useAuthStore();
-  const onSubmit  = async () => {
-    await login({ email: email.value, password: password.value });
-    router.push('/'); 
-    
-  };
-  
+import { ref } from 'vue';
+import { useAuthStore } from '@/store/auth';
+import router from '@/router/index.js';
+
+const email = ref('');
+const password = ref('');
+const { login, isLoggedIn } = useAuthStore();
+const onSubmit = async () => {
+  await login({ email: email.value, password: password.value });
+  router.push('/');
+
+};
+
 </script>
 
 

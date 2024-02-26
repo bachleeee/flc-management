@@ -177,6 +177,32 @@ class GroupService {
       throw new Error(error);
     }
   }
+  async findDocByLessonId(lessonid) {
+    try {
+      const group = await this.databaseSetvices.document.find({
+        lessonid: lessonid
+      }).toArray();
+      if (!group) {
+        return null;
+      }
+      return group; 
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async findVidByLessonId(lessonid) {
+    try {
+      const group = await this.databaseSetvices.video.find({
+        lessonid: lessonid
+      }).toArray();
+      if (!group) {
+        return null;
+      }
+      return group; 
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 
   async update(id, updateGroup) {
     const filter ={
@@ -283,10 +309,10 @@ class GroupService {
       throw new Error(error);
     }
   }
-  async findByCourseId(courseid) {
+  async findByClassId(classid) {
     try {
       const group = await this.databaseSetvices.lesson.find({
-        courseid: courseid,
+        classid: classid,
       }).toArray();
       return group;
     } catch (error) {

@@ -220,7 +220,6 @@ exports.updateSchedule = async (req, res, next) => {
   }
 };
 
-
 exports.deleteClass = async (req, res, next) => {
   const { id } = req.params;
   try {

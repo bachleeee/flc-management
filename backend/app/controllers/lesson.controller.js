@@ -115,11 +115,11 @@ exports.findAll = async (req, res, next) => {
     return res.send(documents);
 };
 
-exports.getLessonByCourse = async (req, res, next) => {
+exports.getLessonByClassId = async (req, res, next) => {
     const { id } = req.params;
     try {
         let documents = [];
-        documents = await groupService.findByCourseId(id);
+        documents = await groupService.findByClassId(id);
         return res.send(documents);
     } catch (error) {
         next(new ApiError(`An error accurred while retrieving class ${id}`, 500));
@@ -149,6 +149,30 @@ exports.findOne = async (req, res, next) => {
         return res.send(document);
     } catch (error) {
         next(new ApiError(`An error accurred while retrieving group ${id}`, 500));
+    }
+};
+exports.findAllDoc = async (req, res, next) => {
+    const { lessonid } = req.params;
+    try {
+        const document = await groupService.findDocByLessonId(lessonid);
+        if (!document) {
+            return next(new ApiError(`Doc with lessonid ${lessonid} not found`, 404));
+        }
+        return res.send(document);
+    } catch (error) {
+        next(new ApiError(`An error accurred while retrieving group ${lessonid}`, 500));
+    }
+};
+exports.findAllVid = async (req, res, next) => {
+    const { lessonid } = req.params;
+    try {
+        const document = await groupService.findVidByLessonId(lessonid);
+        if (!document) {
+            return next(new ApiError(`Vid with lessonid ${lessonid} not found`, 404));
+        }
+        return res.send(document);
+    } catch (error) {
+        next(new ApiError(`An error accurred while retrieving group ${lessonid}`, 500));
     }
 };
 

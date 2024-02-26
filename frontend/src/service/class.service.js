@@ -9,6 +9,9 @@ class ClassService {
     async getAllClass() {
         return (await this.api.get(`/`)).data;
     }
+    async getClass(name) {
+        return (await this.api.get(`/${name}`)).data;
+    }
     async getClassByIdtoArray(id) {
         return (await this.api.get(`/${id}`)).data;
     }

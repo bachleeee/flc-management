@@ -46,6 +46,9 @@ class DatabaseServices {
   get excercise() {
     return this.db.collection("excercise");
   }
+  get progress() {
+    return this.db.collection("progress");
+  }
   get document() {
     return this.db.collection("document");
   }

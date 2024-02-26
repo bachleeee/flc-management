@@ -8,7 +8,8 @@ const {
   deleteAllProducts,
   findOneBySlug,
   getAllCat,
-  createCat
+  createCat,
+  addToCourse
 } = require("../controllers/course.controller");
 
 const router = express.Router();
@@ -22,6 +23,7 @@ router.route("/category").post(createCat)
 
 router.route('/:slug').get(findOneBySlug)
 
+router.route("/addtocourse").post(addToCourse)
 
 // router.route('/cat').post(createCat)
 

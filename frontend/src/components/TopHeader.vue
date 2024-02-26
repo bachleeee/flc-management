@@ -1,7 +1,7 @@
 <template>
   <header class="top-header">
     <nav class="d-flex justify-content-around">
-      <ul class="d-flex justify-content-around align-items-center">
+      <ul class="d-flex justify-content-around">
         <router-link to="/lich-khai-giang">
           <li class="nav-link">Lịch khai giảng</li>
         </router-link>
@@ -10,22 +10,19 @@
           <div class="menu-dropdown" style="width: 600px;">
             <div class="row">
               <ul class="col-6" style="padding-right: 0px;">
-                <li v-for="(cat, index) in cats" :key="index" class="sub-menu">
-                  <span>{{ cat.name }}</span>
+                <li v-for="(category, index) in categories" :key="index" class="sub-menu" @mouseover="showCourses(index)"
+                 >
+                  <span>{{ category.name }}</span>
                   <i class="fa-solid fa-arrow-right mt-1"></i>
                 </li>
               </ul>
-              <div class="col-6" style="padding-left: 0px;">
-                <div class="sub-menu-right" v-for="(cat, index) in cats" :key="index">
-                  <ul v-for="(course, courseIndex) in courses" :key="courseIndex">
-                    <li v-if="course.category == cat._id">
-                      <router-link :to="'/course/' + course.slug">
-                        {{ course.name }}
-                      </router-link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
+              <ul class="sub-menu-right col-6" :class="{ 'show': hoveredCategoryIndex !== null }">
+                <li class="sub-menu-right-item" v-for="(course, courseIndex) in filteredCourses(hoveredCategoryIndex)" :key="courseIndex">
+                  <router-link :to="'/course/' + course.slug">
+                    {{ course.name }}
+                  </router-link>
+                </li>
+              </ul>
             </div>
           </div>
         </li>
@@ -40,11 +37,11 @@
         </router-link>
         <li class="nav-link dropdown" style="background-color: rgb(222, 34, 34);">
           <span>Lớp học của bạn</span>
-          <div class="menu-dropdown">
+          <div class="menu-dropdown" style="width: 158px;">
             <div class="row">
               <ul style="padding: 12px 15px;">
-                <router-link :to="{ name: 'MyClass', params: { className: classItem.tenlop}}" v-for="(classItem, index) in myClass" :key="index">
-
+                <router-link :to="{ name: 'MyClass', params: { className: classItem.tenlop } }"
+                  v-for="(classItem, index) in myClass" :key="index">
                   <span>{{ classItem.tenlop }}</span>
                 </router-link>
               </ul>
@@ -64,11 +61,12 @@ import { useAuthStore } from '@/store/auth';
 export default {
   data() {
     return {
-      cats: [],
+      categories: [],
       courses: [],
       classes: [],
       myCourse: [],
-      myClass: []
+      myClass: [],
+      hoveredCategoryIndex: null,
     };
   },
   computed: {
@@ -79,7 +77,7 @@ export default {
   methods: {
     async getCategory() {
       try {
-        this.cats = await CourseService.getAllCategory();
+        this.categories = await CourseService.getAllCategory();
       } catch (error) {
         console.error("Lỗi khi lấy danh sách khóa học:", error);
       }
@@ -87,7 +85,6 @@ export default {
     async getCourse() {
       try {
         this.courses = await CourseService.getAllCourse();
-        console.log("Danh sach khoa hoc", this.courses)
       } catch (error) {
         console.error("Lỗi khi lấy danh sách khóa học:", error);
       }
@@ -95,7 +92,6 @@ export default {
     async getClass() {
       try {
         this.classes = await ClassService.getAllClass();
-        console.log("Danh sach lop hoc", this.classes)
 
         const userId = this.authStore.user._id;
 
@@ -104,11 +100,22 @@ export default {
             this.myClass.push(classItem);
           }
         }
-        
-        console.log("lớp học của bạn ", this.myClass);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách khóa học:", error);
       }
+    },
+    filteredCourses(categoryIndex) {
+      if (categoryIndex !== null) {
+        return this.courses.filter((course) => course.category === this.categories[categoryIndex]._id);
+      } else {
+        return [];
+      }
+    },
+    showCourses(index) {
+      this.hoveredCategoryIndex = index;
+    },
+    hideCourses(index) {
+      this.hoveredCategoryIndex = null;
     },
   },
   mounted() {
@@ -123,8 +130,10 @@ export default {
 .nav-link {
   text-decoration: none;
   color: #ffffff;
-  transition: color 0.3s, background-color 0.3s;
+  transition: color 0.3s;
   font-size: 17px;
+  font-weight: 400;
+  height: 50px;
 }
 
 a {
@@ -178,26 +187,32 @@ ul {
 .menu-dropdown {
   left: 0px;
   position: absolute;
-  top: 42px;
+  top: 50px;
   color: #000;
   z-index: 1000;
   margin: 0px;
   text-align: left;
   font-size: 15px;
-  border: solid 1px #eeeeee;
   background-color: #fff;
   visibility: hidden;
+  font-weight: 500;
+  font-size: 16px;
 }
 
 .sub-menu-right {
   background-color: #e3e3e3;
+  display: none;
+}
+
+.sub-menu-right.show {
+  display: block;
 }
 
 .sub-menu-right>ul {
   padding-left: 0;
 }
 
-.sub-menu .sub-menu-right :hover {
-  background-color: #f40505;
+.sub-menu-right-item>a:hover {
+  color: #ff9d00;
 }
 </style>

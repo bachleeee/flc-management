@@ -47,7 +47,7 @@
 
 <style scoped>
 .footer {
-    background-color: #0082c8;
+    background-color: #f7f6f6;
     padding: 20px;
     display: flex;
     flex-direction: column;

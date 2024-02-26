@@ -139,3 +139,12 @@ exports.createCat = async (req, res, next) => {
   }
 };
 
+exports.addToCourse = async (req, res, next) => {
+  const {userid, courseid} = req.body
+  try {
+    result = await productService.addToCourse(userid, courseid)
+    return res.send(result);
+  } catch (error) {
+    next(new ApiError("Lỗi khi thêm lớp học", 500));
+  }
+};

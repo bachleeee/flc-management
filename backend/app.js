@@ -5,6 +5,7 @@ const usersRouter = require("./app/routes/users.routes");
 const courseRouter = require("./app/routes/course.routes");
 const classRouter = require("./app/routes/class.routes");
 const lessonRouter = require("./app/routes/lesson.routes");
+const progressRouter = require("./app/routes/progress.routes");
 const commentRouter = require("./app/routes/comment.routes");
 
 require('dotenv').config();
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/users", usersRouter);
 app.use("/api/course", courseRouter);
+app.use("/api/progress", progressRouter);
 app.use("/api/lesson", lessonRouter);
 app.use("/api/class", classRouter);
 app.use("/api/comment", commentRouter);

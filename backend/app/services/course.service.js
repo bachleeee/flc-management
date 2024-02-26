@@ -197,6 +197,33 @@ class ProductService {
     );
     return result;
   }
+
+  async addToCourse(userId, courseId) {
+    const filter = {
+      _id: new ObjectId(courseId),
+    };
+  
+    const update = {
+      $addToSet: {
+        students: userId,
+      },
+    };
+  
+    const options = {
+      returnDocument: 'after',
+    };
+  
+    try {
+      const updatedcourse = await this.databaseSetvices.course.findOneAndUpdate(
+        filter,
+        update,
+        options
+      );
+      return updatedcourse;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 }
 const databaseSetvices = require("../utils/mongodb.util");
 const productService = new ProductService(databaseSetvices);

@@ -1,58 +1,81 @@
 <template>
-    <div class="page">
-        <div class="container py-3">
-            <div class="row">
-                <div class="col-8">
-                    <div style="">
-                        
-                    </div>
-                </div>
-                <div class="col-4">
-                   
-                </div>
+  <div class="page">
+    <div class="container-xxl">
+      <div class="banner">
+        <img src="../assets/img/banner.png" alt="">
+      </div>
+      <div>
+        <section class="first-section">
+          <h2 class="text-center mb-5">Những gì chỉ có tại <span style="color: rgb(61, 61, 253);">DEVLINGO</span></h2>
+          <div class="d-flex justify-content-around">
+            <div class="col-3 intro">
+              <i class="intro-icon fa-solid fa-video"></i>
+              <h5>Video bài giảng chất lượng cao</h5>
+              <p>Bởi đội ngũ giáo viên xuất sắc và tận tâm IELTS 8.0 - 8.5, cựu du học sinh, tốt nghiệp tại các trường Đại học danh tiếng</p>
             </div>
-        </div>
-        <div class="container">
-            <h1>HOME</h1>
-        </div>
+            <div class="col-3 intro">
+              <i class="intro-icon fa-solid fa-clipboard"></i>
+              <h5>Đầy đủ bài mẫu, bài tập, mini test, progress test như thi thật</h5>
+              <p>Bộ tài liệu đã giúp 600 học viên đã đạt IELTS 7.0-8.5 tính tới tháng 5/2021</p>
+            </div>
+            <div class="col-3 intro">
+              <i class="intro-icon fa-solid fa-file"></i>
+              <h5>Bài Speaking-Writing được chấm chất lượng hơn cả offline</h5>
+              <p>Giáo viên chấm bài chính xác từng chữ với Writing, từng giây với Speaking, kết hợp bài kiểm tra phát âm bằng AI</p>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
+  </div>
 </template>
-
 
 <style scoped>
 .page {
-    background-color: #F0F0F0;
+  background-color: rgb(251, 251, 251);
 }
 
-.col {
-    padding-left: 5px;
-    padding-right: 5px;
-
+.banner {
+  width: 100%;
+  height: auto;
 }
 
-.home-section {
-    height: 650px;
-    border-radius: 20px;
-    background-color: white;
-    margin: 0px;
+.banner img {
+  width: 100%;
+  height: auto;
+}
+.first-section {
+    padding-top: 50px;
+    padding-bottom: 150px;
+}
+.intro {
+  background-color: rgb(255, 255, 255);
+  padding: 30px;
+  text-align: center;
+  box-shadow: 30px 20px 35px 10px #d4d4d4;
+  border-radius: 10%;
 }
 
-.intro-section {
-    height: 230px;
-    border-radius: 20px;
-    background-color: white;
-    margin: 20px 0px;
+.intro-icon {
+  background-color: rgb(142, 225, 255);
+  padding: 25px;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  font-size: 30px;
+  margin-bottom: 20px;
+  display: inline-block;
 }
 
-.swiper-slide>img {
-    width: 100%;
-    height: auto;
-    /* Đảm bảo tỷ lệ khung hình bảo toàn */
+.fa-video {
+  color: rgb(251, 23, 23);
 }
 
-.top-title {
-    background-color: rgb(255, 193, 203);
-    border-radius: 20px  20px 0 0 ;
-    margin-bottom: 20px;
+.fa-file {
+  color: rgb(251, 183, 23);
+}
+
+.fa-clipboard {
+  color: rgb(145, 23, 251);
 }
 </style>

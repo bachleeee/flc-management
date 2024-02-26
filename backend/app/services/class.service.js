@@ -257,8 +257,6 @@ class GroupService {
       throw new Error(error);
     }
   }
-  
-  
 }
 const databaseSetvices = require("../utils/mongodb.util");
 const groupService = new GroupService(databaseSetvices);

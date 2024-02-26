@@ -53,8 +53,8 @@ router.route('/logout').post(authenticateToken, logoutUser);
 router.route('/voucher').post(ApplyVoucher)
 
 router.route('/teacher').post(addTeacher)
-router.route('/:id/degree').post(authenticateToken,createDegree)
-router.route('/:id/exp').post(authenticateToken,createExp)
+router.route('/teacher/degree').post(authenticateToken,createDegree)
+router.route('/teacher/exp').post(authenticateToken,createExp)
 
 
 module.exports = router;

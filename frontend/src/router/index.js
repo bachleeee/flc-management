@@ -54,7 +54,7 @@ const routes = [
         component: MyClass,
     },
     {
-        path: "/:lessonName",
+        path: "/luyen-tap/:lessonName",
         name: "LessonDetail",
         component: LessonDetail,
     },
