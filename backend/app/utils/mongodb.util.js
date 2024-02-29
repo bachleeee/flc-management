@@ -43,8 +43,8 @@ class DatabaseServices {
   get lesson() {
     return this.db.collection("lesson");
   }
-  get excercise() {
-    return this.db.collection("excercise");
+  get exam() {
+    return this.db.collection("exam");
   }
   get progress() {
     return this.db.collection("progress");

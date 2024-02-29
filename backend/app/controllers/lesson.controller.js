@@ -34,7 +34,7 @@ exports.createVideo = async (req, res, next) => {
     }
 };
 
-exports.createExcercise = async (req, res, next) => {
+exports.createExam = async (req, res, next) => {
     try {
         const result = await groupService.createEx(req.body);
         res.send(result);
@@ -43,18 +43,18 @@ exports.createExcercise = async (req, res, next) => {
     }
 };
 
-exports.submitExcercise = async (req, res, next) => {
+exports.submitExam = async (req, res, next) => {
     const { id } = req.params;
     try {
-        const excercise = await groupService.findExById(id);
-        if (!excercise) {
+        const exam = await groupService.findExById(id);
+        if (!exam) {
             return next(new ApiError(`Group with id ${id} not found`, 404));
         }
         const submittedAnswers = req.body.answers.split(',');
 
         const correctOptions = [];
 
-        excercise.questions.forEach(question => {
+        exam.questions.forEach(question => {
             const correctOption = question.options[question.correctOptionIndex];
             correctOptions.push(correctOption);
         });
@@ -169,6 +169,19 @@ exports.findAllVid = async (req, res, next) => {
         const document = await groupService.findVidByLessonId(lessonid);
         if (!document) {
             return next(new ApiError(`Vid with lessonid ${lessonid} not found`, 404));
+        }
+        return res.send(document);
+    } catch (error) {
+        next(new ApiError(`An error accurred while retrieving group ${lessonid}`, 500));
+    }
+};
+
+exports.findAllEx = async (req, res, next) => {
+    const { lessonid } = req.params;
+    try {
+        const document = await groupService.findExByLessonId(lessonid);
+        if (!document) {
+            return next(new ApiError(`Ex with lessonid ${lessonid} not found`, 404));
         }
         return res.send(document);
     } catch (error) {

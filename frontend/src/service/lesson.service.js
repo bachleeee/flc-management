@@ -18,5 +18,8 @@ class LessonService {
     async getVid(lessonid) {
         return (await this.api.get(`/video/${lessonid}`)).data;
     }
+    async getEx(lessonid) {
+        return (await this.api.get(`/exam/${lessonid}`)).data;
+    }
 }
 export default new LessonService();

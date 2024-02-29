@@ -61,7 +61,7 @@ class GroupService {
 
   async createEx(data) {
     const group = this.extractGroupData(data);
-    const result = await this.databaseSetvices.excercise.findOneAndUpdate(
+    const result = await this.databaseSetvices.exam.findOneAndUpdate(
       group,
       {
         $set: { },
@@ -76,7 +76,7 @@ class GroupService {
 
   async findExById(id) {
     try {
-      const group = await this.databaseSetvices.excercise.findOne({
+      const group = await this.databaseSetvices.exam.findOne({
         _id: new ObjectId(id),
       });
       if (!group) {
@@ -193,6 +193,19 @@ class GroupService {
   async findVidByLessonId(lessonid) {
     try {
       const group = await this.databaseSetvices.video.find({
+        lessonid: lessonid
+      }).toArray();
+      if (!group) {
+        return null;
+      }
+      return group; 
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async findExByLessonId(lessonid) {
+    try {
+      const group = await this.databaseSetvices.exam.find({
         lessonid: lessonid
       }).toArray();
       if (!group) {

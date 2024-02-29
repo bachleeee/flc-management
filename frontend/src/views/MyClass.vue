@@ -160,14 +160,22 @@ export default {
       try {
         const cookieValue = Cookies.get('token');
         const data = {
-          classid: this.myClass._id, 
-          lessonid: lessonId, 
-          status: "inprogress", 
+          classid: this.myClass._id,
+          lessonid: lessonId,
+          status: "inprogress",
         };
 
         if (this.authStore.isLoggedIn && this.myClass) {
-          await ProgressService.createProgress(cookieValue, data);
-          console.log("Tiến độ đã được tạo cho bài học có ID:", lessonId);
+          const existingProgress = await ProgressService.getMyProgress(cookieValue, this.myClass._id);
+
+          const hasExistingProgress = existingProgress.some(progress => progress.lessonid === lessonId);
+
+          if (!hasExistingProgress) {
+            await ProgressService.createProgress(cookieValue, data);
+            console.log("Tiến độ đã được tạo cho bài học có ID:", lessonId);
+          } else {
+            console.log("Tiến trình đã tồn tại cho bài học có ID:", lessonId);
+          }
         } else {
           console.error('Không có thông tin tiến độ hoặc người dùng chưa đăng nhập.');
         }
@@ -175,6 +183,7 @@ export default {
         console.error("Lỗi khi tạo tiến độ:", error);
       }
     },
+
 
   },
   created() {

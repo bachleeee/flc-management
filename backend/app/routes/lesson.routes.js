@@ -14,9 +14,9 @@ const {
   updateVid,
   deleteDoc,
   deleteVid,
-  createExcercise,
-  submitExcercise,
-  findOneEx,
+  createExam,
+  submitExam,
+  findAllEx,
   getLessonByClassId,
   findAllDoc,
   findAllVid
@@ -34,10 +34,10 @@ router.route("/document/:lessonid([0-9a-fA-F]{24})").get(findAllDoc).put(updateD
 router.route("/video").post(createVideo)
 router.route("/video/:lessonid([0-9a-fA-F]{24})").get(findAllVid).put(updateVid).delete(deleteVid);
 
-router.route("/excercise").post(createExcercise)
-router.route("/excercise/:id([0-9a-fA-F]{24})").get(findOneEx).put(updateVid).delete(deleteVid);
+router.route("/exam").post(createExam)
+router.route("/exam/:lessonid([0-9a-fA-F]{24})").get(findAllEx).put(updateVid).delete(deleteVid);
 
-router.route("/excercise/:id([0-9a-fA-F]{24})").post(authenticateToken,submitExcercise)
+router.route("/exam/:id([0-9a-fA-F]{24})").post(authenticateToken,submitExam)
 
 router.route('/:slug').get(findOneBySlug)
 
