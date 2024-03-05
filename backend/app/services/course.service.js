@@ -29,19 +29,17 @@ class ProductService {
     return result;
   }
 
-  async findAllPaged(page, limit) {
+  async findAllPaged() {
     try {
-      const skip = (page - 1) * limit;
-      const products = await this.databaseSetvices.course.find().skip(skip).limit(limit).toArray();
+      const products = await this.databaseSetvices.course.find().toArray();
       return products;
     } catch (error) {
       throw new Error(error);
     }
   }
   
-  async findByNamePaged(name, page, limit) {
+  async findByNamePaged(name) {
     try {
-      const skip = (page - 1) * limit;
       const products = await this.databaseSetvices.course
         .find({
           name: {
@@ -49,8 +47,6 @@ class ProductService {
             $options: "i",
           },
         })
-        .skip(skip)
-        .limit(limit)
         .toArray();
       return products;
     } catch (error) {
@@ -58,41 +54,41 @@ class ProductService {
     }
   }
   
-  async findByCategoryPaged(category, page, limit) {
-    try {
-      const skip = (page - 1) * limit;
-      const products = await this.databaseSetvices.course
-        .find({
-          category: category,
-        })
-        .skip(skip)
-        .limit(limit)
-        .toArray();
-      return products;
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
+  // async findByCategoryPaged(category, page, limit) {
+  //   try {
+  //     const skip = (page - 1) * limit;
+  //     const products = await this.databaseSetvices.course
+  //       .find({
+  //         category: category,
+  //       })
+  //       .skip(skip)
+  //       .limit(limit)
+  //       .toArray();
+  //     return products;
+  //   } catch (error) {
+  //     throw new Error(error);
+  //   }
+  // }
   
-  async findByNameAndCategoryPaged(name, category, page, limit) {
-    try {
-      const skip = (page - 1) * limit;
-      const products = await this.databaseSetvices.course
-        .find({
-          name: {
-            $regex: new RegExp(name),
-            $options: "i",
-          },
-          category: category,
-        })
-        .skip(skip)
-        .limit(limit)
-        .toArray();
-      return products;
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
+  // async findByNameAndCategoryPaged(name, category, page, limit) {
+  //   try {
+  //     const skip = (page - 1) * limit;
+  //     const products = await this.databaseSetvices.course
+  //       .find({
+  //         name: {
+  //           $regex: new RegExp(name),
+  //           $options: "i",
+  //         },
+  //         category: category,
+  //       })
+  //       .skip(skip)
+  //       .limit(limit)
+  //       .toArray();
+  //     return products;
+  //   } catch (error) {
+  //     throw new Error(error);
+  //   }
+  // }
 
   async findBySlug(slug) {
     try {

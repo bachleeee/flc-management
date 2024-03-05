@@ -27,8 +27,7 @@
                                 <div v-if="authStore.isLoggedIn" class="user-container">
                                     <div class="btn-user" @mouseover="showDropdown" @mouseleave="hideDropdown">
                                         <div class="icon-user">
-                                            <i class="fa fa-user"></i>
-                                            
+                                            <i class="fa fa-user"></i>   
                                         </div>
                                         <div v-if="isDropdownVisible" class="dropdown-menu px-1">
                                             <ul>
@@ -57,12 +56,10 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
-    <TopHeader></TopHeader>
 </template>
 
 <script>

@@ -17,7 +17,13 @@ exports.createUser = async (req, res, next) => {
   }
 
   try {
-    const result = await userService.create(req.body);
+    const data = {
+      avatar: "avatar-default",
+      ...req.body,
+      birthday: new Date(req.body.birthday) 
+    };
+
+    const result = await userService.create(data);
     res.send(result);
   } catch (error) {
     next(new ApiError("An error occurred while creating the user", 500));
@@ -49,6 +55,7 @@ exports.loginUser = async (req, res, next) => {
     token: generateToken(user?._id),  
   });
 };
+
 exports.loginAdmin = async (req, res, next) => {
   const { email, password } = req.body;
 
