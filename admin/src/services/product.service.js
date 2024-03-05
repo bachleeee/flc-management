@@ -1,12 +1,12 @@
 import createApiClient from "./api.service";
 class ProductService {
-    constructor(baseUrl = "/api/products") {
+    constructor(baseUrl = "/api/course") {
         this.api = createApiClient(baseUrl);
     }
     async create(data) {
         return (await this.api.post("/", data)).data;
     }
-    async getAll(page, limit) {
+    async getAll() {
         return (await this.api.get('/', { params: { page, limit } })).data;
       }
     async deleteAll() {

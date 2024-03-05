@@ -3,7 +3,7 @@ class UserService {
     constructor(baseUrl = "/api/users") {
         this.api = createApiClient(baseUrl);
     }
-    async getAll() {
+    async getAllUser() {
         return (await this.api.get("/")).data;
     }
     async getAllOrder() {

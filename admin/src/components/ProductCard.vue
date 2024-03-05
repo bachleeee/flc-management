@@ -23,6 +23,7 @@ export default {
 </script>
 
 <template>
+  
   <div>
     <div class="p-1">
       <strong>Tên:</strong>

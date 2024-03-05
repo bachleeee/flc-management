@@ -1,13 +1,25 @@
 import { createWebHistory, createRouter } from "vue-router";
 import User from '@/views/User.vue';
+import UserEdit from '@/views/UserEdit.vue';
 import Login from '@/views/Login.vue';
 import Product from '@/views/Product.vue';
 import Order from '@/views/Order.vue';
 const routes = [
     {
-        path: "/User",
+        path: "/user",
         name: "user",
         component: User,
+    },
+    {
+        path: "/user/:id",
+        name: "user.edit",
+        component: UserEdit,
+    },
+    {
+        path:"/user.add",
+        name: "user.add",
+        component: () => import("@/views/UserAdd.vue"),
+        props: true
     },
     {
         path: "/",

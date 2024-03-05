@@ -1,37 +1,44 @@
 <template>
   <div class="sidebar">
     <div class="logo">
-      <img src="../assets/img/mybookstrore (1).png" alt="Logo" />
+      <img style="width: 190px;" src="../assets/img/Blue White Modern Learning Center Logo.png" alt="Logo" />
     </div>
     <nav>
       <ul>
         <li>
-          <router-link to="/product">
-            <i class="fas fa-box"></i> Quản lý sản phẩm
+          <router-link to="/user">
+            <i class="fas fa-users"></i> Quản lý người dùng
           </router-link>
         </li>
         <li>
-          <router-link to="/user">
-            <i class="fas fa-users"></i> Quản lý khách hàng
+          <router-link to="/product">
+            <i class="fas fa-box"></i> Quản lý khóa học
           </router-link>
         </li>
         <li>
           <router-link to="/order">
-            <i class="fas fa-shopping-cart"></i> Quản lý đơn hàng
+            <i class="fas fa-shopping-cart"></i> Quản lý đơn đăng ký
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/schedule">
+            <i class="far fa-calendar"></i> Quản lý lịch học
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/resources">
+            <i class="fas fa-book"></i> Quản lý tài nguyên
           </router-link>
         </li>
       </ul>
-      
-
     </nav>
-    <div v-if="authStore.isLoggedIn" class="ml-2 logout-button">
-        <button class="btn btn-secondary mb-5 ml-5" @click="logoutClick">Logout</button>
-      </div>
+    <div v-if="authStore.isLoggedIn" class="logout-btn">
+      <button class="btn btn-secondary" @click="logoutClick">Logout</button>
+    </div>
   </div>
 </template>
 
 <script>
-import UserService from '@/services/user.service';
 import { useAuthStore } from '@/store/auth';
 export default {
   computed: {
@@ -52,18 +59,16 @@ export default {
 </script>
 
 <style scoped>
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
+a:hover {
+  text-decoration: none;
 }
 
 .sidebar {
-  width: 200px;
-  background-color: #333;
+  width: 16.666667%;
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  padding-top: 20px;
+  background-color: #ffffff;
   position: fixed;
   left: 0;
   top: 0;
@@ -74,6 +79,7 @@ export default {
 .logo {
   text-align: center;
   margin-bottom: 20px;
+  
 }
 
 .logo img {
@@ -89,31 +95,23 @@ nav ul {
 
 nav li {
   padding: 10px;
-  text-align: center;
+  text-align: start;
   transition: background-color 0.3s;
-  border-bottom: 1px solid #555;
-  /* Thêm đường viền dưới */
 }
 
 nav li:last-child {
   border-bottom: none;
-  /* Loại bỏ đường viền dưới của phần tử cuối cùng */
 }
 
 nav li:hover {
-  background-color: #555;
+  background-color: #ece9e9;
 }
 
 nav a {
-  color: #fff;
-  text-decoration: none;
+  color: #000000;
 }
 
 nav i {
   margin-right: 8px;
-}
-
-nav a:hover {
-  text-decoration: underline;
 }
 </style>
