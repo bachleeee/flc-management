@@ -13,7 +13,8 @@
         <div class="col-md-6">
           <div class="form-group">
             <label for="role">Vai trò</label>
-            <Field as="select" name="role" class="form-control" v-model="userLocal.role">
+            <Field as="select" name="role" class="form-control" v-model="userLocal.role"
+              :disabled="isRoleFieldDisabled">
               <option value="">Chọn vai trò</option>
               <option value="student">Học viên</option>
               <option value="teacher">Giáo viên</option>
@@ -46,20 +47,32 @@
         <Field name="avatar" type="text" class="form-control" v-model="userLocal.avatar" />
         <ErrorMessage name="avatar" class="error-feedback" />
       </div>
-
-      <!-- Các trường khác -->
-
-      <div class="form-group">
-        <button class="btn btn-primary">Lưu</button>
-        <button v-if="userLocal._id" type="button" class="ml-2 btn btn-danger" @click="deleteUser">
-          Xóa
-        </button>
+      <div v-if="myClass > 0" class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label for="myClass">Lớp học bạn đã đăng ký</label>
+            <ul>
+              <li v-for="(classItem, index) in myClass" :key="index">{{ classItem }}</li>
+            </ul>
+          </div>
+        </div>
       </div>
+
+      <div class="row justify-content-center">
+        <div class="form-group">
+          <button class="btn btn-success">Lưu</button>
+          <button v-if="userLocal._id" type="button" class="ml-2 btn btn-danger" @click="deleteUser">
+            Xóa
+          </button>
+        </div>
+      </div>
+
     </Form>
   </div>
 </template>
 
 <script>
+import ClassService from '@/services/class.service'
 import * as yup from "yup";
 import { Form, Field, ErrorMessage } from "vee-validate";
 export default {
@@ -70,8 +83,10 @@ export default {
   },
   emits: ["submit:user", "delete:user"],
   props: {
-    user: { type: Object, required: true }
+    user: { type: Object, required: true },
+    isRoleFieldDisabled: { type: Boolean }
   },
+
   data() {
     const userFormSchema = yup.object().shape({
       name: yup
@@ -82,7 +97,7 @@ export default {
     return {
       userLocal: this.user,
       userFormSchema,
-
+      myClass: this.user.myClass,
     };
   },
   methods: {
@@ -98,6 +113,10 @@ export default {
 </script>
 
 <style scoped>
+li {
+  list-style: none;
+}
+
 .form-group {
   margin-bottom: 20px;
 }

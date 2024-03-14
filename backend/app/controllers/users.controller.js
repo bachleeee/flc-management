@@ -20,7 +20,6 @@ exports.createUser = async (req, res, next) => {
     const data = {
       avatar: "avatar-default",
       ...req.body,
-      birthday: new Date(req.body.birthday) 
     };
 
     const result = await userService.create(data);

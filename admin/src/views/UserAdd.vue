@@ -1,46 +1,49 @@
 <template>
-    <div class="p-4">
-      <div class="bg-white p-3 rounded">
-        <div class="col-12">
-
- <h4>Thêm sản phẩm mới</h4>
-        <ProductForm :product="product" @submit:product="createProduct" />
-        <p>{{ message }}</p>
-           
-          </div>
-      </div>
-    </div>
-    <div class="m-5  d-flex flex-column align-items-center">
-       
+    <div class="container-xxl ">
+        <div class="p-4">
+            <div class="row justify-content-center">
+                <div class="col-8">
+                    <div class="bg-white p-3 rounded">
+                        <div class="container my-4 d-flex flex-column align-items-center">
+                            <h4>Thêm người dùng mới</h4>
+                            <UserForm class="py-4" :user="user" @submit:user="createUser"
+                                :isRoleFieldDisabled="isRoleFieldDisabled" />
+                            <p>{{ message }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
+
 <script>
-import ProductForm from "@/components/ProductForm.vue";
-import ProductService from "@/services/product.service";
+import UserForm from "@/components/UserForm.vue";
+import UserService from "@/services/user.service";
 export default {
     components: {
-        ProductForm,
+        UserForm,
     },
     data() {
         return {
-            product: {
+            user: {
                 name: '',
-                description: '',
-                price: '',
-                quantity: '',
-                category: '',
-                img: '',
+                email: '',
+                role: '',
+                phone: '',
+                avatar: '',
             },
             message: "",
+            isRoleFieldDisabled: false
         };
     },
     methods: {
-        async createProduct(data) {
+        async createUser(data) {
             try {
-                await ProductService.create(data);
-                window.alert("Sản phẩm được thêm thành công.");
+                await UserService.create(data);
+                window.alert("Người dung được thêm thành công.");
                 setTimeout(() => {
-                    this.$router.push({ name: "product" });
+                    this.$router.push({ name: "user" });
                 }, 2000);
             } catch (error) {
                 console.log(error);

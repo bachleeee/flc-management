@@ -6,8 +6,8 @@ class CourseService {
     async create(data) {
         return (await this.api.post("/", data)).data;
     }
-    async getAllCourse(data) {
-        return (await this.api.get("/", data)).data;
+    async getAllCourse() {
+        return (await this.api.get("/")).data;
     }
     async getAll(name,page, limit) {
         return (await this.api.get(`/?name=${name}`,{ params: { page, limit } })).data;

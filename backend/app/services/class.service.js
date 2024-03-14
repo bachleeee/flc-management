@@ -19,7 +19,7 @@ class GroupService {
     const result = await this.databaseSetvices.class.findOneAndUpdate(
       group,
       {
-        $set: { },
+        $set: { siso: 0 },
       },
       {
         upsert: true,
@@ -155,6 +155,19 @@ class GroupService {
       throw new Error(error);
     }
   }
+  async findScheduleById(id) {
+    try {
+      const group = await this.databaseSetvices.schedule.findOne({
+        _id: new ObjectId(id),
+      });
+      if (!group) {
+        return null;
+      }
+      return group; 
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
   
   async findByname(name) {
     try {
@@ -218,6 +231,16 @@ class GroupService {
         _id: new ObjectId(id),
       });
       return group;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async deleteSchedule(tenlop) {
+    try {
+      const schedule = await this.databaseSetvices.schedule.deleteMany({
+        tenlop: tenlop
+      });
+      return schedule;
     } catch (error) {
       throw new Error(error);
     }

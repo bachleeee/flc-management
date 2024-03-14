@@ -5,26 +5,20 @@ const userService = require("../services/user.service");
 const { convertDayOfWeekToNumber } = require('../utils/createSlug');
 
 exports.createClass = async (req, res, next) => {
-  const { id } = req.params;
-
   try {
-    const courseid = id;
-
-    if (!req.body.ngaybd) {
-      throw new Error("Thiếu thông tin ngày bắt đầu.");
-    }
-
-    const ngaybatdau = new Date(req.body.ngaybd);
+    const ngaybatdau = new Date(req.body.ngaybatdau);
 
     const sotuanhoc = req.body.sobuoihoc / req.body.sobuoitrongtuan;
 
     const ngayketthuc = new Date(ngaybatdau);
-
-    ngayketthuc.setDate(ngayketthuc.getDate() + (sotuanhoc + 8) * 7);
+    if(req.body.hinhthuc == 'online'){
+      ngayketthuc.setDate(ngayketthuc.getDate() + 365*10);
+    } else {
+      ngayketthuc.setDate(ngayketthuc.getDate() + (sotuanhoc + 8) * 7);
+    }
 
     const result = await classService.create({
       ...req.body,
-      courseid,
       ngaybatdau,
       ngayketthuc
     });
@@ -34,53 +28,6 @@ exports.createClass = async (req, res, next) => {
     next(new ApiError("Lỗi tạo lớp học: " + error.message, 500));
   }
 };
-
-exports.createClassSchedule = async (req, res, next) => {
-  const { id } = req.params;
-  const classid = id;
-
-  try {
-    const myClass = await classService.findById(classid);
-
-    const startDate = myClass.ngaybatdau;
-    const totalSessions = myClass.sobuoihoc;
-    const daysOfClass = myClass.thu;
-
-    const schedules = [];
-
-    let currentDate = new Date(startDate);
-    let sessionsCount = 0;
-
-    while (sessionsCount < totalSessions) {
-      const thu = currentDate.getDay();
-      if (daysOfClass.includes(thu)) {
-        const gioBatDau = new Date(currentDate);
-        const gioKetThuc = new Date(currentDate);
-
-        gioKetThuc.setHours(gioKetThuc.getHours() + 2);
-
-        const classSchedule = {
-          classid,
-          ...req.body,
-          giobatdau: gioBatDau,
-          gioketthuc: gioKetThuc,
-          stt: sessionsCount + 1,
-        };
-
-        schedules.push(classSchedule);
-        await classService.createSchedule(classSchedule);
-        sessionsCount++;
-      }
-
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-
-    return res.send(schedules);
-  } catch (error) {
-    next(new ApiError("Lỗi tạo lịch học", 500));
-  }
-};
-
 exports.findAll = async (req, res, next) => {
   let documents = [];
   try {
@@ -156,6 +103,18 @@ exports.findOne = async (req, res, next) => {
     next(new ApiError(`An error accurred while retrieving class ${id}`, 500));
   }
 };
+exports.findOneClassSchedule = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const document = await classService.findScheduleById(id);
+    if (!document) {
+      return next(new ApiError(`Class with id ${id} not found`, 404));
+    }
+    return res.send(document);
+  } catch (error) {
+    next(new ApiError(`An error accurred while retrieving class ${id}`, 500));
+  }
+};
 exports.findOneByName = async (req, res, next) => {
   const { name } = req.params;
   try {
@@ -176,7 +135,7 @@ exports.update = async (req, res, next) => {
   const { id } = req.params;
   const _data = {
     tenlop: req.body.tenlop,
-    soluong: req.body.soluong,
+    soluongtoida: req.body.soluongtoida,
   };
   try {
     const document = await classService.update(id, _data);
@@ -189,7 +148,7 @@ exports.update = async (req, res, next) => {
   }
 };
 
-exports.updateSchedule = async (req, res, next) => {
+exports.updateClassSchedule = async (req, res, next) => {
   if (Object.keys(req.body).length === 0) {
     return next(new ApiError("Update data cannot be empty", 400));
   }
@@ -250,8 +209,94 @@ exports.addToClass = async (req, res, next) => {
   const {userid, classid} = req.body
   try {
     result = await classService.addToClass(userid, classid)
-    return res.send(result);
+    const myClass = await classService.findById(classid);
+    result1 = await userService.addToClass(userid, myClass.tenlop)
+    return res.send(result1);
   } catch (error) {
     next(new ApiError("Lỗi khi thêm lớp học", 500));
+  }
+};
+
+exports.createClassSchedule = async (req, res, next) => {
+  const { id } = req.params;
+  const classid = id;
+
+  try {
+    const myClass = await classService.findById(classid);
+
+    const startDate = myClass.ngaybatdau;
+    const totalSessions = myClass.sobuoihoc;
+    const daysOfClass = myClass.thu;
+
+    const schedules = [];
+
+    let currentDate = new Date(startDate);
+    let sessionsCount = 0;
+
+    while (sessionsCount < totalSessions) {
+      const thu = currentDate.getDay();
+      if (daysOfClass.includes(thu)) {
+        const gioBatDau = new Date(currentDate);
+        const gioKetThuc = new Date(currentDate);
+
+        gioKetThuc.setHours(gioKetThuc.getHours() + 2);
+
+        let buoi;
+        const gioBatDauHour = gioBatDau.getHours();
+
+        if (gioBatDauHour >= 0 && gioBatDauHour < 12) {
+          buoi = "morning";
+        } else if (gioBatDauHour >= 12 && gioBatDauHour < 18) {
+          buoi = "afternoon";
+        } else {
+          buoi = "evening";
+        }
+
+        const classSchedule = {
+          tenlop: myClass.tenlop,
+          phong: req.body.phong,
+          buoi,
+          gioBatDau,
+          gioKetThuc,
+          stt: sessionsCount + 1,
+        };
+
+        schedules.push(classSchedule);
+        await classService.createSchedule(classSchedule);
+        sessionsCount++;
+      }
+
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return res.send(schedules);
+  } catch (error) {
+    next(new ApiError("Lỗi tạo lịch học", 500));
+  }
+};
+
+exports.deleteClassSchedule = async (req, res, next) => {
+  const { id } = req.params;
+  const classid = id;
+
+  try {
+    const myClass = await classService.findById(classid);
+
+    if (!myClass) {
+      return next(new ApiError(`Class with id ${id} not found`, 404));
+    }
+   // Xóa các lịch học của lớp học
+    const document = await classService.deleteSchedule(myClass.tenlop);
+    // Kiểm tra xem liệu lịch học đã được xóa thành công hay không
+    if (!document) {
+      return next(new ApiError(`No schedules found for class with id ${id}`, 404));
+    }
+    // Trả về phản hồi thành công
+    return res.send({
+      message: `Class with id ${id} was deleted successfully`,
+    }); 
+  } catch (error) {
+    // Chuyển lỗi sang middleware lỗi tiếp theo
+    next(new ApiError(`An error occurred while deleting class schedule ${id}: ${error.message}`, 500));
   }
 };

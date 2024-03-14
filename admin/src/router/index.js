@@ -1,6 +1,12 @@
 import { createWebHistory, createRouter } from "vue-router";
 import User from '@/views/User.vue';
 import UserEdit from '@/views/UserEdit.vue';
+import Course from '@/views/Course.vue';
+import CourseEdit from '@/views/CourseEdit.vue';
+import Class from '@/views/Class.vue';
+import ClassEdit from '@/views/ClassEdit.vue';
+import Schedule from '@/views/Schedule.vue';
+import ScheduleEdit from '@/views/ScheduleEdit.vue';
 import Login from '@/views/Login.vue';
 import Product from '@/views/Product.vue';
 import Order from '@/views/Order.vue';
@@ -19,6 +25,54 @@ const routes = [
         path:"/user.add",
         name: "user.add",
         component: () => import("@/views/UserAdd.vue"),
+        props: true
+    },
+    {
+        path: "/course",
+        name: "course",
+        component: Course,
+    },
+    {
+        path: "/course/:id",
+        name: "course.edit",
+        component: CourseEdit,
+    },
+    {
+        path:"/course.add",
+        name: "course.add",
+        component: () => import("@/views/CourseAdd.vue"),
+        props: true
+    },
+    {
+        path: "/class",
+        name: "class",
+        component: Class,
+    },
+    {
+        path: "/class/:id",
+        name: "class.edit",
+        component: ClassEdit,
+    },
+    {
+        path:"/class.add",
+        name: "class.add",
+        component: () => import("@/views/ClassAdd.vue"),
+        props: true
+    },
+    {
+        path: "/schedule",
+        name: "schedule",
+        component: Schedule,
+    },
+    {
+        path: "/schedule/:id",
+        name: "schedule.edit",
+        component: ScheduleEdit,
+    },
+    {
+        path:"/schedule.add",
+        name: "schedule.add",
+        component: () => import("@/views/ScheduleAdd.vue"),
         props: true
     },
     {

@@ -48,7 +48,6 @@ export default {
       }
     },
     async modifyUser(index, userId) {
-      this.$emit("addBreadcrumb", { label: "Chỉnh sửa người dùng", to: null });
     this.$router.push({
       name: 'user.edit',
       params: { id: userId },

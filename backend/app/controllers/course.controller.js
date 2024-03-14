@@ -71,10 +71,10 @@ exports.update = async (req, res, next) => {
   }
   const { id } = req.params;
   const _data = {
-    title: req.body.title,
+    name: req.body.name,
     des: req.body.des,
     price: req.body.price,
-    quantity: req.body.quantity,
+    status: req.body.status,
     img: req.body.img,
     category: req.body.category,
   };

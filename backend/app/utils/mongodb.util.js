@@ -67,6 +67,9 @@ class DatabaseServices {
   get comment() {
     return this.db.collection("comment");
   }
+  get room() {
+    return this.db.collection("room");
+  }
   get reply() {
     return this.db.collection("reply");
   }

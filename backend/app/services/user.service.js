@@ -19,7 +19,7 @@ class UserService {
     const result = await this.databaseSetvices.users.findOneAndUpdate(
       user,
       {
-        $setOnInsert: { role: "student" },
+        $setOnInsert: { },
       },
       {
         upsert: true,
@@ -147,6 +147,33 @@ class UserService {
     try {
       const user = await this.databaseSetvices.users.findOne({ email });
       return user;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async addToClass(userId, myClass) {
+    const filter = {
+      _id: new ObjectId(userId),
+    };
+  
+    const update = {
+      $addToSet: {
+        myClass: myClass,
+      },
+    };
+  
+    const options = {
+      returnDocument: 'after',
+    };
+  
+    try {
+      const updatedClass = await this.databaseSetvices.users.findOneAndUpdate(
+        filter,
+        update,
+        options
+      );
+      return updatedClass;
     } catch (error) {
       throw new Error(error);
     }

@@ -4,9 +4,9 @@
       <div class="row justify-content-center">
         <div class="col-8">
           <div class="bg-white p-3 rounded">
-            <div v-if="user" class="container my-4 d-flex flex-column align-items-center">
-              <h4>Hiệu chỉnh người dùng </h4>
-              <UserForm class="py-4" :user="user" @submit:user="updateUser" @delete:user="deleteUser"
+            <div v-if="course" class="container mt-4 d-flex flex-column align-items-center">
+              <h4>Hiệu chỉnh Khóa học </h4>
+              <CourseForm :course="course" @submit:course="updateCourse" @delete:course="deleteCourse"
                 :isRoleFieldDisabled="isRoleFieldDisabled" />
               <p>{{ message }}</p>
             </div>
@@ -18,24 +18,25 @@
 </template>
 
 <script>
-import UserForm from "@/components/UserForm.vue";
-import UserService from "@/services/user.service";
+import CourseForm from "@/components/CourseForm.vue";
+import CourseService from "@/services/course.service";
 
 export default {
   components: {
-    UserForm,
+    CourseForm,
   },
   data() {
     return {
-      user: null,
+      course: null,
       message: "",
-      isRoleFieldDisabled: true
+      isRoleFieldDisabled: true,
+      isAddForm: false,
     };
   },
   methods: {
-    async getUser() {
+    async getCourse() {
       try {
-        this.user = await UserService.get(this.$route.params.id);
+        this.course = await CourseService.getById(this.$route.params.id);
       } catch (error) {
         console.log(error);
         this.$router.push({
@@ -48,19 +49,20 @@ export default {
         });
       }
     },
-    async updateUser(data) {
+    async updateCourse(data) {
       try {
-        await UserService.update(this.user._id, data);
-        window.alert("người dùng được cập nhật thành công.");
+        console.log("clicked")
+        await CourseService.update(this.course._id, data);
+        window.alert("Khóa học được cập nhật thành công.");
       } catch (error) {
         console.log(error);
       }
     },
-    async deleteUser() {
-      if (confirm("Bạn muốn xóa người dùng này?")) {
+    async deleteCourse() {
+      if (confirm("Bạn muốn xóa Khóa học này?")) {
         try {
-          await UserService.delete(this.user._id);
-          this.$router.push({ name: "user" });
+          await CourseService.delete(this.course._id);
+          this.$router.push({ name: "course" });
         } catch (error) {
           console.log(error);
         }
@@ -68,7 +70,7 @@ export default {
     },
   },
   created() {
-    this.getUser();
+    this.getCourse();
     this.message = "";
   },
 };
