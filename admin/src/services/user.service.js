@@ -36,5 +36,8 @@ class UserService {
     async reducePQ(data) {
         return (await this.api.put("/reduce", data)).data; 
     }
+    async addClass(data) {
+        return (await this.api.post("/class", data)).data;
+    }
 }
 export default new UserService();

@@ -14,13 +14,27 @@
     <td v-if="course.hinhthuc == 'offline'" class="col-1 table-items">{{ formatHour(course.ngaybatdau) }}</td>
     <td v-else class="col-1 table-items">-</td>
 
-    <td class="col-2">
+    <td class="col-3">
+      <button class="btn btn-sm btn-warning mr-4" @click="toggleDetail(index)">
+        Detail
+      </button>
       <button class="btn btn-sm btn-danger mr-4" @click="deleteCourse(index, course._id)">
         Delete
       </button>
       <button class="btn btn-sm btn-info" @click="modifyCourse(index, course._id)">
         Edit
       </button>
+      <div v-if="showDetail[index]" class="class-detail">
+        <div class="d-flex justify-content-center p-4" style="background-color: white; flex-direction: column;">
+          Danh sách học viên của lớp
+          <ul>
+            <li v-for="(student, index) in getAllStudentOfClass(course.tenlop)" :key="index">
+              {{ index + 1 }} {{ student.name }}
+            </li>
+          </ul>
+          <button class="btn btn-danger" @click="showDetail[index] = false">Đóng</button>
+        </div>
+      </div>
     </td>
   </tr>
 </template>
@@ -30,8 +44,15 @@ import moment from "moment";
 import ClassService from "@/services/class.service";
 
 export default {
+  data() {
+    return {
+      showDetail: [],
+      studentsOfClass: [],
+    }
+  },
   props: {
     courses: { type: Array, default: [] },
+    users: { type: Array, default: [] },
     activeIndex: { type: Number, default: -1 },
     startIndex: Number,
   },
@@ -51,7 +72,6 @@ export default {
       const today = new Date();
       const start = new Date(startDate);
       const end = new Date(endDate);
-      console.log(start)
       if (today < start)
         return 'Sắp khai giảng'
       else if (today < end)
@@ -86,6 +106,25 @@ export default {
         params: { id: courseId },
       });
     },
+    async getAllStudentOfClass(name) {
+      const data = {
+        className: name
+      }
+      try {
+        this.studentsOfClass = await ClassService.getAllOffClass(data)
+        console.log(this.studentsOfClass);
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    toggleDetail(index) {
+
+      if (this.showDetail[index]) {
+        this.showDetail[index] = false;
+      } else {
+        this.showDetail[index] = true;
+      }
+    },
     formattedDays(days) {
       if (Array.isArray(days) && days.length > 0) {
         const daysOfWeek = ['Chủ nhật', '2', '3', '4', '5', '6', '7'];
@@ -95,16 +134,29 @@ export default {
         return ''; // hoặc bất kỳ giá trị mặc định nào bạn muốn trả về cho trường hợp không phải mảng
       }
     },
-
     formatHour(dateTimeString) {
       const hour = moment(dateTimeString).format('HH:mm');
       return hour;
     },
-  }
+  },
+  mounted() {
+  // Gọi phương thức getAllStudentOfClass() cho từng lớp học trong danh sách courses
+  this.courses.forEach(course => {
+    this.getAllStudentOfClass(course.tenlop);
+  });
+}
 };
 </script>
 
 <style>
+li {
+  list-style: none;
+}
+
+ul {
+  padding: 0;
+}
+
 .table td,
 .table th {
   padding: 0.45rem;
@@ -117,5 +169,20 @@ export default {
 
 .modify-icon {
   cursor: pointer;
+}
+
+.class-detail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  /* Đảm bảo giá trị z-index cao hơn so với các phần tử khác */
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Background mờ để làm nổi bật phần tử này */
 }
 </style>

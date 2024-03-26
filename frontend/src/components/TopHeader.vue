@@ -12,7 +12,7 @@
               <ul class="col-6" style="padding-right: 0px;">
                 <li v-for="(category, index) in categories" :key="index" class="sub-menu" @mouseover="showCourses(index)"
                  >
-                  <span>{{ category.name }}</span>
+                  <span style="text-transform: uppercase;">{{ category.name }}</span>
                   <i class="fa-solid fa-arrow-right mt-1"></i>
                 </li>
               </ul>
@@ -40,9 +40,9 @@
           <div class="menu-dropdown" style="width: 158px;">
             <div class="row">
               <ul style="padding: 12px 15px;">
-                <router-link :to="{ name: 'MyClass', params: { className: classItem.tenlop } }"
+                <router-link :to="{ name: 'MyClass', params: { className: classItem.className } }"
                   v-for="(classItem, index) in myClass" :key="index">
-                  <span>{{ classItem.tenlop }}</span>
+                  <span>{{ classItem.className }}</span>
                 </router-link>
               </ul>
             </div>
@@ -92,21 +92,15 @@ export default {
     async getClass() {
       try {
         this.classes = await ClassService.getAllClass();
+        this.myClass = this.authStore.user.myClass
 
-        const userId = this.authStore.user._id;
-
-        for (const classItem of this.classes) {
-          if (classItem.students && classItem.students.includes(userId)) {
-            this.myClass.push(classItem);
-          }
-        }
       } catch (error) {
         console.error("Lỗi khi lấy danh sách khóa học:", error);
       }
     },
     filteredCourses(categoryIndex) {
       if (categoryIndex !== null) {
-        return this.courses.filter((course) => course.category === this.categories[categoryIndex]._id);
+        return this.courses.filter((course) => course.category === this.categories[categoryIndex].name);
       } else {
         return [];
       }

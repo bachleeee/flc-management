@@ -1,140 +1,207 @@
 <template>
-    <div class="container">
-        <div class="my-5" v-if="authStore.isLoggedIn">
-            <div class="order-list">
-                <h4>
-                    Danh sách đơn hàng
-                    <i class="fa-solid fa-file"></i>
-                </h4>
-                <div v-for="order in orders" :key="order.id" class="order-item">
-                    <div class="order-info row">
-                        <div class="col-2">
-                            <p><strong>Khách hàng:</strong></p>
-                            <h5>{{ getCustomerName(order.orderby) }}</h5>
-                        </div>
-                        <div class="col-3">
-                            <p><strong>Danh sách sản phẩm:</strong></p>
-                            <div v-for="product in order.products" :key="product._id">
-                                <p>{{ product.products[0].name }}</p>
+    <div class="container-xxl">
+        <div class="p-4">
+            <div v-if="authStore.isLoggedIn">
+                <div class="bg-white p-3 rounded">
+                    <div class="col-12">
+                        <div class="semibold pb-4">
+                            Danh sách Đơn đăng ký
+                            <div class="row align-items-center justify-content-between px-3 pt-2">
+                                <div class="col-5 ">
+                                    <InputSearch v-model="searchText" />
+                                </div>
+                                <div class="px-4 ">
+                                    <button class="btn btn-sm btn-secondary mx-4" @click="goToAddOrder">
+                                        <i class="fas fa-plus"></i> Thêm
+                                    </button>
+                                    <button class="btn btn-sm btn-primary" @click="refreshList">
+                                        <i class="fas fa-redo"></i> Làm mới
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-2">
-                            <p><strong>Số lượng:</strong></p>
-                            <div v-for="product in order.products" :key="product._id">
-                                <p>{{ product.products[0].count }}</p>
-                            </div>
-                        </div>
-                        <div class="col-2">
-                            <p><strong>Tổng tiền: </strong></p>
-                            <p class="order-price">{{ order.amount }}</p>
-                        </div>
-                        <div class="col-2">
-                            <p><strong>Trạng thái:</strong> </p>
-                            <p class="order-status">{{ order.orderStatus }}</p>
-                            <p><strong>Cập nhật trạng thái</strong></p>
-                            <select v-model="order.orderStatus" @change="updateOrderStatus(order)">
-                                <option value="confirmed">Đã xác nhận</option>
-                                <option value="shipped">Đang vận chuyển</option>
-                                <option value="completed">Đã hoàn thành</option>
-                            </select>
-                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="col-1">#</th>
+                                    <th scope="col" class="col-2">Tên học viên</th>
+                                    <th scope="col" class="col-1">Lớp</th>
+                                    <th scope="col" class="col-1">Ngày</th> 
+                                    <th scope="col" class="col-1">Tổng</th>
+                                    <th scope="col" class="col-1">Trạng thái</th>
+                                    <th scope="col" class="col-2"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <OrderList v-if="filteredOrdersCount > 0" :orders="paginatedOrders"
+                                    v-model:activeIndex="activeIndex" :start-index="startIndex" />
+                                <p v-else>Không có Đơn đăng ký.</p>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="6" class="text-right">
+                                        <ul class="pagination">
+                                            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                                                <button class="page-link" @click="changePage(currentPage - 1)"
+                                                    :disabled="currentPage === 1">Previous</button>
+                                            </li>
+                                            <li class="page-item" v-for="page in totalPages" :key="page"
+                                                :class="{ active: page === currentPage }">
+                                                <button class="page-link" @click="changePage(page)">{{ page }}</button>
+                                            </li>
+                                            <li class="page-item" :class="{ disabled: currentPage === totalPages }">
+                                                <button class="page-link" @click="changePage(currentPage + 1)"
+                                                    :disabled="currentPage === totalPages">Next</button>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
-  
+
 <script>
-import userService from '@/services/user.service';
+import InputSearch from "@/components/InputSearch.vue";
+import OrderList from "@/components/OrderList.vue";
+import OrderService from "@/services/order.service";
 import { useAuthStore } from '@/store/auth';
 
 export default {
+    components: {
+        InputSearch,
+        OrderList,
+    },
     data() {
         return {
             orders: [],
-            users: [],
+            activeIndex: -1,
+            searchText: "",
+            itemsPerPage: 7,
+            currentPage: 1,
+            sortDirection: 'asc',
+            sortField: 'name'
         };
     },
+    watch: {
+        searchText() {
+            this.activeIndex = -1;
+        },
+        sortField() {
+            this.sortOrders();
+        },
+        sortDirection() {
+            this.sortOrders();
+        }
+    },
     computed: {
+        orderStrings() {
+            return this.orders.map((order) => {
+                const { name } = order;
+                return [name].join("").toLowerCase();
+            });
+        },
+        filteredOrders() {
+            const lowercaseSearchText = this.searchText.toLowerCase();
+            if (!lowercaseSearchText) return this.orders;
+            return this.orders.filter((_order, index) =>
+                this.orderStrings[index].includes(lowercaseSearchText)
+            );
+        },
+        activeOrder() {
+            if (this.activeIndex < 0) return null;
+            return this.filteredOrders[this.activeIndex];
+        },
+        filteredOrdersCount() {
+            return this.filteredOrders.length;
+        },
         authStore() {
             return useAuthStore();
         },
+        //phân trang
+        paginatedOrders() {
+            const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+            const endIndex = startIndex + this.itemsPerPage;
+            return this.filteredOrders.slice(startIndex, endIndex);
+        },
+        totalPages() {
+            return Math.ceil(this.filteredOrders.length / this.itemsPerPage);
+        },
+        startIndex() {
+            return (this.currentPage - 1) * this.itemsPerPage + 1;
+        }
     },
     methods: {
-        async getAllOrders() {
+        async retrieveOrders() {
             try {
-                this.orders = await userService.getAllOrder();
+                this.orders = await OrderService.getAllOrder()
             } catch (error) {
-                console.error('Error fetching order list:', error);
-            }
-        },
-        async getAlluser() {
-            try {
-                this.users = await userService.getAll()
-            }
-            catch (error) {
                 console.log(error);
             }
         },
-        getCustomerName(orderby) {
-            const customer = this.users.find(users => users._id === orderby);
-            return customer ? customer.name : 'Khách hàng không tồn tại';
+        refreshList() {
+            this.retrieveOrders();
+            this.activeIndex = -1;
         },
-        async updateOrderStatus(order) {
-            try {
-                const updatedOrder = {
-                    id: order._id,
-                    orderStatus: order.orderStatus
-                };
-                console.log(updatedOrder)
-                await userService.updateOrderStatus(updatedOrder);
-
-                for (const product of order.products) {
-                    const updateQuantity = {
-                        product_id: product.products[0].product,
-                        count: product.products[0].count
-                    };
-                    if (order.orderStatus === 'confirmed') {
-                        await userService.reducePQ(updateQuantity)
-                    }
-                }
-
-
-            } catch (error) {
-                console.error('Error updating order status:', error);
+        goToAddOrder() {
+            this.$router.push({ name: "order.add" });
+        },
+        //phan trang
+        changePage(page) {
+            if (page >= 1 && page <= this.totalPages) {
+                this.currentPage = page;
             }
         },
+        //sap xep name
+        sortOrders() {
+            const compareFn = (a, b) => {
+                const fieldA = a[this.sortField].toUpperCase();
+                const fieldB = b[this.sortField].toUpperCase();
+
+                let comparison = 0;
+                if (fieldA > fieldB) {
+                    comparison = 1;
+                } else if (fieldA < fieldB) {
+                    comparison = -1;
+                }
+
+                return this.sortDirection === 'asc' ? comparison : -comparison;
+            };
+
+            this.filteredOrders.sort(compareFn);
+        },
+        changeSort(field) {
+            if (this.sortField === field) {
+                this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.sortField = field;
+                this.sortDirection = 'asc';
+            }
+
+            this.searchText = this.searchText.toLowerCase(); // Chuyển đổi sang chữ thường
+        },
+        
     },
     mounted() {
-        this.getAllOrders();
-        this.getAlluser();
+        this.refreshList();
     },
+
 };
 </script>
-  
+
 <style scoped>
-.order-item {
-    list-style: none;
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    padding: 15px;
-    margin-bottom: 15px
+table th {
+    background-color: rgb(218, 218, 218);
+    font-weight: 500;
+    text-transform: uppercase;
 }
 
-.order-info {
-    padding: 10px;
-    margin-bottom: 10px;
-}
-
-.order-status {
-    color: #007bff;
-    font-weight: bold;
-}
-
-.order-price {
-    color: red;
-    font-weight: bold;
+.semibold {
+    font-size: 1.5rem;
+    font-weight: 500;
 }
 </style>
-  

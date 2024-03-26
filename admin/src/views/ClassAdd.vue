@@ -35,7 +35,8 @@ export default {
                 sobuoihoc: '',
                 sobuoitrongtuan: '',
                 thu: [],
-                soluongtoida: ''
+                soluongtoida: '',
+                thoigianhoc: '',
             },
             message: "",
             courses: [],

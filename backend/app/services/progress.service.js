@@ -54,6 +54,17 @@ class ProgressService {
       throw new Error(error);
     }
   }
+  async findByUserIdAndLessonId(userid, lessonid) {
+    try {
+      const progress = await this.databaseServices.progress.findOne({
+        userid: userid,
+        lessonid: lessonid,
+      });
+      return progress; 
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 
   async findAll() {
     try {

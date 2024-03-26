@@ -7,8 +7,10 @@ const classRouter = require("./app/routes/class.routes");
 const lessonRouter = require("./app/routes/lesson.routes");
 const progressRouter = require("./app/routes/progress.routes");
 const commentRouter = require("./app/routes/comment.routes");
+const examRouter = require("./app/routes/exam.routes");
 const roomRouter = require("./app/routes/room.routes");
 const scheduleRouter = require("./app/routes/schedule.routes");
+const orderRouter = require("./app/routes/order.routes");
 
 require('dotenv').config();
 const app = express();
@@ -27,9 +29,11 @@ app.use("/api/course", courseRouter);
 app.use("/api/progress", progressRouter);
 app.use("/api/lesson", lessonRouter);
 app.use("/api/class", classRouter);
+app.use("/api/order", orderRouter);
 app.use("/api/schedule", scheduleRouter);
 app.use("/api/room", roomRouter);
 app.use("/api/comment", commentRouter);
+app.use("/api/exam", examRouter);
 
 // handle 404 response
 app.use((req, res, next) => {

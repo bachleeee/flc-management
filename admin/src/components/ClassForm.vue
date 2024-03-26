@@ -5,15 +5,15 @@
         <div class="col-md-6">
           <div class="form-group">
             <label for="tenlop">Tên lớp học</label>
-            <Field name="tenlop" type="text" class="form-control" v-model="classLocal.tenlop" />
+            <Field name="tenlop" type="text" class="form-control" v-model="classLocal.tenlop"  />
             <ErrorMessage name="tenlop" class="error-feedback" />
           </div>
         </div>
         <div class="col-md-6">
           <div class="form-group">
             <label for="courseName">Khóa học</label>
-            <Field as="select" name="courseName" class="form-control" v-model="classLocal.courseName">
-              <option value="" disabled selected>Chọn khóa học</option>
+            <Field as="select" name="courseName" class="form-control" v-model="classLocal.courseName" >
+              <option value="" selected>Chọn khóa học</option>
               <option v-for="(course, index) in courses" :key="course.index" :value="course.name">
                 {{ course.name }}
               </option>
@@ -28,7 +28,7 @@
           <div class="form-group">
             <label for="hinhthuc">Hình thức học</label>
             <Field as="select" name="hinhthuc" class="form-control" v-model="classLocal.hinhthuc"
-              @change="checkOfflineFields">
+              @change="checkOfflineFields" >
               <option value="">Chọn hình thức lớp học</option>
               <option value="online">Online</option>
               <option value="offline">Trực tiếp</option>
@@ -42,7 +42,7 @@
           <div class="form-group">
             <label for="ngaybatdau">Ngày bắt đầu</label>
             <Field as="input" type="text" name="ngaybatdau" class="form-control flatpickr"
-              v-model="classLocal.ngaybatdau" />
+              v-model="classLocal.ngaybatdau"  />
             <ErrorMessage name="ngaybatdau" class="error-feedback" />
           </div>
         </div>
@@ -53,21 +53,29 @@
           <div class="col-md-3">
             <div class="form-group">
               <label for="soluongtoida">Số học viên tối đa</label>
-              <Field name="soluongtoida" type="text" class="form-control" v-model="classLocal.soluongtoida" />
+              <Field name="soluongtoida" type="number" class="form-control" v-model="classLocal.soluongtoida" />
               <ErrorMessage name="soluongtoida" class="error-feedback" />
             </div>
           </div>
           <div class="col-md-3">
             <div class="form-group">
               <label for="sobuoihoc">Số buổi học</label>
-              <Field name="sobuoihoc" type="text" class="form-control" v-model="classLocal.sobuoihoc" />
+              <Field name="sobuoihoc" type="number" class="form-control" v-model="classLocal.sobuoihoc" />
               <ErrorMessage name="sobuoihoc" class="error-feedback" />
             </div>
           </div>
           <div class="col-md-3">
             <div class="form-group">
+              <label for="thoigianhoc">Thời gian học</label>
+              <Field name="thoigianhoc" type="number" class="form-control" v-model="classLocal.thoigianhoc" />
+              <ErrorMessage name="thoigianhoc" class="error-feedback" />
+            </div>
+
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
               <label for="sobuoitrongtuan">Số buổi trong tuần</label>
-              <Field name="sobuoitrongtuan" type="text" class="form-control" v-model="classLocal.sobuoitrongtuan" />
+              <Field name="sobuoitrongtuan" type="number" class="form-control" v-model="classLocal.sobuoitrongtuan" />
               <ErrorMessage name="sobuoitrongtuan" class="error-feedback" />
             </div>
           </div>
@@ -76,14 +84,14 @@
               <label>Thứ</label>
               <div class="form-check" v-for="(day, index) in daysOfWeek" :key="index">
                 <input type="checkbox" class="form-check-input" :id="'thu' + index" name="thu" :value="index + 1"
-                  :disabled="isCheckboxDisabled(day)" v-model="classData.thu" />
+                  :disabled="isCheckboxDisabled(day)" v-model="classLocal.thu" />
                 <label class="form-check-label" :for="'thu' + index">{{ day }}</label>
               </div>
               <ErrorMessage name="thu" class="error-feedback" />
             </div>
           </div>
-
         </div>
+
       </div>
 
       <div v-else>
@@ -91,35 +99,40 @@
           <div class="col-md-6">
             <div class="form-group">
               <label for="sobuoihoc">Số buổi học</label>
-              <Field name="sobuoihoc" type="text" class="form-control" v-model="classLocal.sobuoihoc" />
+              <Field name="sobuoihoc" type="number" class="form-control" v-model="classLocal.sobuoihoc"  />
               <ErrorMessage name="sobuoihoc" class="error-feedback" />
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label for="sobuoitrongtuan">Số buổi trong tuần</label>
-              <Field name="sobuoitrongtuan" type="text" class="form-control" v-model="classLocal.sobuoitrongtuan" />
+              <Field name="sobuoitrongtuan" type="number" class="form-control" v-model="classLocal.sobuoitrongtuan"
+                 />
               <ErrorMessage name="sobuoitrongtuan" class="error-feedback" />
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label>Thứ</label>
-              <div class="form-check" v-for="(day, index) in daysOfWeek" :key="index">
-                <input type="checkbox" class="form-check-input" :id="'thu' + index" name="thu" v-model="classData.thu"
-                  :value="day">
-                <label class="form-check-label" :for="'thu' + index">{{ day }}</label>
-              </div>
+              <Field name="thu" type="text" class="form-control" v-model="formattedSelectedDays"  />
               <ErrorMessage name="thu" class="error-feedback" />
             </div>
-
 
           </div>
           <div class="col-md-6">
             <div class="form-group">
               <label for="soluongtoida">Số lượng học viên tối đa</label>
-              <Field name="soluongtoida" type="text" class="form-control" v-model="classLocal.soluongtoida" />
+              <Field name="soluongtoida" type="number" class="form-control" v-model="classLocal.soluongtoida"
+                 />
               <ErrorMessage name="soluongtoida" class="error-feedback" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="students">Danh sách học viên</label>
+              <Field name="students" type="number" class="form-control" v-model="classLocal.students"
+                 />
+              <ErrorMessage name="students" class="error-feedback" />
             </div>
           </div>
         </div>
@@ -160,36 +173,20 @@ export default {
     const classFormSchema = yup.object().shape({
       tenlop: yup
         .string()
+        .required('Vui lòng nhập tên lớp.')
         .min(2, "Tên phải ít nhất 2 ký tự.")
         .max(50, "Tên có nhiều nhất 50 ký tự."),
-      sobuoihoc: yup
-        .number()
-        .required('Vui lòng nhập số buổi học.')
-        .min(20, 'Số buổi học ít nhất là 20.')
-        .max(50, 'Số buổi học nhiều nhất là 50.'),
-      sobuoitrongtuan: yup
-
-        .number()
-        .required('Vui lòng nhập số buổi trong tuần.')
-        .min(2, 'Số buổi trong tuần ít nhất là 2.')
-        .max(4, 'Số buổi trong tuần nhiều nhất là 4.'),
-      soluongtoida: yup
-        .number()
-        .required('Vui lòng nhập số lượng học viên tối đa.')
-        .min(5, 'Số lượng học viên tối đa ít nhất là 5.')
-        .max(20, 'Số lượng học viên tối đa nhiều nhất là 20.'),
-      thu: yup
-        .array()
-        .min(1, 'Vui lòng chọn ít nhất một ngày trong tuần.')
-        .max(7, 'Vui lòng chọn tối đa bảy ngày trong tuần.'),
-
+      ngaybatdau: yup
+        .string()
+        .required('Vui lòng nhập ngày bắt đầu.')
+        .min(2, "Tên phải ít nhất 2 ký tự.")
+        .max(50, "Tên có nhiều nhất 50 ký tự."),
     });
-
     return {
       classLocal: this.classData,
       classFormSchema,
       showOfflineFields: false,
-      daysOfWeek: ['Hai', 'Ba', 'Tư', 'Năm', 'Sáu', 'Bảy'],
+      daysOfWeek: ['Hai', 'Ba', 'Tư', 'Năm', 'Sáu', 'Bảy',],
     };
   },
 
@@ -197,6 +194,15 @@ export default {
     selectedDaysCount() {
       return this.classData.thu.length;
     },
+    formattedSelectedDays() {
+      if (Array.isArray(this.classLocal.thu) && this.classLocal.thu.length > 0) {
+        const daysOfWeek = ['Chủ nhật', 'Hai', 'Ba', 'Tư', 'Năm', 'Sáu', 'Bảy'];
+        const selectedDays = this.classLocal.thu.map(day => daysOfWeek[day]);
+        return selectedDays.join(', ');
+      } else {
+        return ''; // hoặc bất kỳ giá trị mặc định nào bạn muốn trả về cho trường hợp không phải mảng
+      }
+    }
   },
   methods: {
     initializeFlatpickr() {
@@ -218,6 +224,7 @@ export default {
     isCheckboxDisabled(day) {
       return this.selectedDaysCount >= this.classLocal.sobuoitrongtuan && !this.classData.thu.includes(day);
     },
+
   },
   mounted() {
     this.initializeFlatpickr();
@@ -255,5 +262,4 @@ label {
   font-size: 14px;
   margin-top: 5px;
 }
-
 </style>

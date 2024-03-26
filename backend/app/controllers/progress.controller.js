@@ -2,7 +2,7 @@ const ApiError = require("../api-error");
 const progressService = require("../services/progress.service");
 
 exports.createProgress = async (req, res, next) => {
-  const {id} = req.user;
+  const { id } = req.user;
 
   try {
     const userid = id;
@@ -75,28 +75,32 @@ exports.findOne = async (req, res, next) => {
 
 exports.getMyProgress = async (req, res, next) => {
   const { id } = req.user;
-  const { classid } = req.params;
+  const { classid, lessonid } = req.query;
   try {
-    const document = await progressService.findByUserIdAndClassId(id,classid);
+    let document;
+    if (classid) {
+      document = await progressService.findByUserIdAndClassId(id, classid);
+    } else if (lessonid) {
+      document = await progressService.findByUserIdAndLessonId(id, lessonid);
+    }
     if (!document) {
       return next(new ApiError(`Progress with userid ${id} not found`, 404));
     }
     return res.send(document);
   } catch (error) {
-    next(new ApiError(`An error accurred while retrieving progress ${id}`, 500));
+    next(new ApiError(`An error occurred while retrieving progress ${id}`, 500));
   }
 };
+
 
 exports.update = async (req, res, next) => {
   if (Object.keys(req.body).length === 0) {
     return next(new ApiError("Update data cannot be empty", 400));
   }
   const { id } = req.params;
-  const _data = {
 
-  };
   try {
-    const document = await progressService.update(id, _data);
+    const document = await progressService.update(id, req.body);
     if (!document) {
       return next(new ApiError(`Progress with id ${id} not found`, 404));
     }

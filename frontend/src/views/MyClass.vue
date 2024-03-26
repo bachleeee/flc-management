@@ -7,8 +7,7 @@
           <div class="px-4">
             <div class="bg-white p-4">
               <div class="d-flex flex-column mb-4 align-items-center">
-                <h3 style="color: blue;">{{ myCourse.name }}</h3>
-                <p>{{ myCourse.target }}</p>
+                <h3 v-if="myClass" style="color: blue;">{{ myClass.courseName }}</h3>
                 <p>{{ lesson.length }} Bài học</p>
               </div>
               <div class="d-flex flex-wrap">
@@ -49,7 +48,7 @@
                       <span class="lesson-number">{{ index + 1 }}</span>
                     </div>
                     <div class="d-flex flex-column">
-                      <strong class="course-name">{{ myCourse.name }}</strong>
+                      <strong class="course-name">{{ myClass.courseName }}</strong>
                       <strong class="lesson-name">{{ lessonItem.name }}</strong>
                     </div>
                   </li>
@@ -67,7 +66,6 @@
 </template>
 
 <script>
-import CourseService from "@/service/course.service";
 import ClassService from "@/service/class.service";
 import LessonService from "@/service/lesson.service";
 import ProgressService from "@/service/progress.service";
@@ -77,7 +75,6 @@ import Cookies from 'js-cookie';
 export default {
   data() {
     return {
-      myCourse: null,
       myClass: null,
       lesson: [],
       myProgress: [],
@@ -93,51 +90,26 @@ export default {
     },
   },
   methods: {
-    async getMyCourseAndMyClass() {
+    async getMyClass() {
       try {
-        this.classes = await ClassService.getAllClass();
-        const userId = this.authStore.user._id;
-
-        for (const classItem of this.classes) {
-          if (classItem.students && classItem.students.includes(userId)) {
-            this.myClass = classItem;
-            break;
-          }
-        }
+        const className = this.$route.params.className; // Sử dụng this.$route.params.className để lấy giá trị của tham số className từ router
+        console.log(className);
+        this.myClass = await ClassService.getClass(className);
 
         if (this.myClass) {
-          const courseid = this.myClass.courseid;
-          this.myCourse = await CourseService.getById(courseid);
 
-          console.log("Lớp học của bạn:", this.myClass);
-          console.log("Khóa học của bạn:", this.myCourse);
-
-          const classid = this.myClass._id;
-          this.lesson = await LessonService.getLessonByClassId(classid);
-
+          const courseName = this.myClass.courseName;
+          this.lesson = await LessonService.getLessonByClassName(this.myClass.tenlop);
           console.log("Danh sách bài học:", this.lesson);
+
+          const cookieValue = Cookies.get('token');
+          this.myProgress = await ProgressService.getMyProgress(cookieValue, this.myClass._id);
+          console.log("Tiến độ học tập của bạn:", this.myProgress);
         } else {
           console.log("Không tìm thấy lớp học phù hợp.");
         }
       } catch (error) {
         console.error("Lỗi khi lấy danh sách lớp học:", error);
-      }
-    },
-    async getmyProgress() {
-      try {
-        const cookieValue = Cookies.get('token');
-        if (this.authStore.isLoggedIn) {
-          if (this.myClass) {
-            this.myProgress = await ProgressService.getMyProgress(cookieValue, this.myClass._id);
-            console.log("Tiến độ học tập của bạn:", this.myProgress);
-          } else {
-            console.error('Không có thông tin tiến độ.');
-          }
-        } else {
-          console.error('User is not logged in.');
-        }
-      } catch (error) {
-        console.error("Lỗi lấy tiến độ:", error);
       }
     },
     getLessonImg(lessonId) {
@@ -167,7 +139,7 @@ export default {
 
         if (this.authStore.isLoggedIn && this.myClass) {
           const existingProgress = await ProgressService.getMyProgress(cookieValue, this.myClass._id);
-
+          
           const hasExistingProgress = existingProgress.some(progress => progress.lessonid === lessonId);
 
           if (!hasExistingProgress) {
@@ -183,15 +155,10 @@ export default {
         console.error("Lỗi khi tạo tiến độ:", error);
       }
     },
-
-
   },
   created() {
-    this.getMyCourseAndMyClass();
+  this.getMyClass();
   },
-  mounted() {
-    this.getmyProgress();
-  }
 };
 </script>
 

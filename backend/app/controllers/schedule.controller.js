@@ -43,10 +43,10 @@ exports.findAllByDate = async (req, res, next) => {
 exports.findAllByShiftAndDate = async (req, res, next) => {
   let documents = [];
   try {
-    const { buoi,date } = req.query
-    
-    documents = await scheduleService.findAllByShiftAndDate(buoi,date);
-  
+    const { buoi, date } = req.query
+
+    documents = await scheduleService.findAllByShiftAndDate(buoi, date);
+
   } catch (error) {
     next(new ApiError("An error occurred while retrieving schedules", 500));
   }
@@ -133,5 +133,90 @@ exports.deleteAllSchedules = async (req, res, next) => {
     });
   } catch (error) {
     next(new ApiError("An error accurred while deleting schedules", 500));
+  }
+};
+
+exports.createDaysOff = async (req, res, next) => {
+  try {
+    const ngayBatDau = new Date(req.body.ngayBatDau)
+    const ngayKetThuc = new Date(req.body.ngayKetThuc)
+
+    const data = {
+      ngayBatDau,
+      ngayKetThuc,
+      noiDung: req.body.noiDung
+    }
+
+    const result = await scheduleService.createDaysOff(data);
+    return res.send(result);
+  } catch (error) {
+    next(new ApiError("Lỗi tạo phòng học", 500));
+  }
+};
+
+exports.findAllDaysOff = async (req, res, next) => {
+  let documents = [];
+  try {
+  
+    documents = await scheduleService.findAllDaysOff();
+    
+  } catch (error) {
+    next(new ApiError("An error occurred while retrieving schedules", 500));
+  }
+  return res.send(documents);
+};
+exports.createDaysOff = async (req, res, next) => {
+  try {
+    const ngayBatDau = new Date(req.body.ngayBatDau)
+    const ngayKetThuc = new Date(req.body.ngayKetThuc)
+
+    const data = {
+      ngayBatDau,
+      ngayKetThuc,
+      noiDung: req.body.noiDung
+    }
+
+    const result = await scheduleService.createDaysOff(data);
+    return res.send(result);
+  } catch (error) {
+    next(new ApiError("Lỗi tạo ngày nghỉ", 500));
+  }
+};
+
+exports.updateDaysOff = async (req, res, next) => {
+
+  if (Object.keys(req.body).length === 0) {
+    return next(new ApiError("Update data cannot be empty", 400));
+  }
+  const { id } = req.params;
+
+  const updatedData = {
+    ngayBatDau: req.body.ngayBatDau,
+    ngayKetThuc: req.body.ngayKetThuc,
+    noiDung: req.body.noiDung
+  };
+  try {
+    const result = await scheduleService.updateDaysOff(id,updatedData);
+    return res.send(result);
+  } catch (error) {
+    next(new ApiError("Lỗi tạo ngày nghỉ", 500));
+  }
+};
+
+exports.deleteDaysOff = async (req, res, next) => {
+  try {
+    const ngayBatDau = new Date(req.body.ngayBatDau)
+    const ngayKetThuc = new Date(req.body.ngayKetThuc)
+
+    const data = {
+      ngayBatDau,
+      ngayKetThuc,
+      noiDung: req.body.noiDung
+    }
+
+    const result = await scheduleService.createDaysOff(data);
+    return res.send(result);
+  } catch (error) {
+    next(new ApiError("Lỗi tạo ngày nghỉ", 500));
   }
 };

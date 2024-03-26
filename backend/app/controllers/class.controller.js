@@ -11,10 +11,10 @@ exports.createClass = async (req, res, next) => {
     const sotuanhoc = req.body.sobuoihoc / req.body.sobuoitrongtuan;
 
     const ngayketthuc = new Date(ngaybatdau);
-    if(req.body.hinhthuc == 'online'){
-      ngayketthuc.setDate(ngayketthuc.getDate() + 365*10);
+    if (req.body.hinhthuc == 'online') {
+      ngayketthuc.setDate(ngayketthuc.getDate() + 365 * 10);
     } else {
-      ngayketthuc.setDate(ngayketthuc.getDate() + (sotuanhoc + 8) * 7);
+      ngayketthuc.setDate(ngayketthuc.getDate() + (sotuanhoc + 2) * 7);
     }
 
     const result = await classService.create({
@@ -31,24 +31,12 @@ exports.createClass = async (req, res, next) => {
 exports.findAll = async (req, res, next) => {
   let documents = [];
   try {
-    const { name, category, page, limit } = req.query;
+    const { courseName } = req.query;
 
-    const pageNumber = parseInt(page) || 1;
-    const limitNumber = parseInt(limit) || 10;
-
-    if (name && category) {
-      documents = await classService.findByNameAndCategoryPaged(
-        name,
-        category,
-        pageNumber,
-        limitNumber
-      );
-    } else if (name) {
-      documents = await classService.findByNamePaged(name, pageNumber, limitNumber);
-    } else if (category) {
-      documents = await classService.findByCategoryPaged(category, pageNumber, limitNumber);
+    if (courseName) {
+      documents = await classService.findByCourseName(courseName);
     } else {
-      documents = await classService.findAllPaged(pageNumber, limitNumber);
+      documents = await classService.findAll();
     }
   } catch (error) {
     next(new ApiError("An error occurred while retrieving classs", 500));
@@ -60,6 +48,19 @@ exports.findArrayClassById = async (req, res, next) => {
   let documents = [];
   try {
     documents = await classService.findByIdtoArray(req.body);
+
+  } catch (error) {
+    next(new ApiError("An error occurred while retrieving classs", 500));
+  }
+  return res.send(documents);
+};
+
+
+exports.findAllOfClass = async (req, res, next) => {
+  let documents = [];
+  const className = req.body.className
+  try {
+    documents = await userService.findAllOfClass(className);
 
   } catch (error) {
     next(new ApiError("An error occurred while retrieving classs", 500));
@@ -136,6 +137,7 @@ exports.update = async (req, res, next) => {
   const _data = {
     tenlop: req.body.tenlop,
     soluongtoida: req.body.soluongtoida,
+    siso: req.body.siso,
   };
   try {
     const document = await classService.update(id, _data);
@@ -206,12 +208,12 @@ exports.deleteAllClass = async (req, res, next) => {
 };
 
 exports.addToClass = async (req, res, next) => {
-  const {userid, classid} = req.body
+  const classid = req.body.classid
+  const tenHocVien = req.body.tenHocVien
   try {
-    result = await classService.addToClass(userid, classid)
-    const myClass = await classService.findById(classid);
-    result1 = await userService.addToClass(userid, myClass.tenlop)
-    return res.send(result1);
+
+    result = await classService.addToClass(classid,tenHocVien)
+    return res.send(result);
   } catch (error) {
     next(new ApiError("Lỗi khi thêm lớp học", 500));
   }
@@ -227,6 +229,7 @@ exports.createClassSchedule = async (req, res, next) => {
     const startDate = myClass.ngaybatdau;
     const totalSessions = myClass.sobuoihoc;
     const daysOfClass = myClass.thu;
+    const timeInterval = myClass.thoigianhoc; // Thêm biến thời gian học
 
     const schedules = [];
 
@@ -239,7 +242,7 @@ exports.createClassSchedule = async (req, res, next) => {
         const gioBatDau = new Date(currentDate);
         const gioKetThuc = new Date(currentDate);
 
-        gioKetThuc.setHours(gioKetThuc.getHours() + 2);
+        gioKetThuc.setHours(gioKetThuc.getHours() + timeInterval); // Thay đổi giờ kết thúc
 
         let buoi;
         const gioBatDauHour = gioBatDau.getHours();
@@ -275,6 +278,7 @@ exports.createClassSchedule = async (req, res, next) => {
   }
 };
 
+
 exports.deleteClassSchedule = async (req, res, next) => {
   const { id } = req.params;
   const classid = id;
@@ -285,7 +289,7 @@ exports.deleteClassSchedule = async (req, res, next) => {
     if (!myClass) {
       return next(new ApiError(`Class with id ${id} not found`, 404));
     }
-   // Xóa các lịch học của lớp học
+    // Xóa các lịch học của lớp học
     const document = await classService.deleteSchedule(myClass.tenlop);
     // Kiểm tra xem liệu lịch học đã được xóa thành công hay không
     if (!document) {
@@ -294,7 +298,7 @@ exports.deleteClassSchedule = async (req, res, next) => {
     // Trả về phản hồi thành công
     return res.send({
       message: `Class with id ${id} was deleted successfully`,
-    }); 
+    });
   } catch (error) {
     // Chuyển lỗi sang middleware lỗi tiếp theo
     next(new ApiError(`An error occurred while deleting class schedule ${id}: ${error.message}`, 500));

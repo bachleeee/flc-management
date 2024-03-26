@@ -26,6 +26,11 @@
           </router-link>
         </li>
         <li>
+          <router-link to="/exam">
+            <i class="fa-solid fa-folder-open"></i> Ngân hàng câu hỏi
+          </router-link>
+        </li>
+        <li>
           <router-link to="/schedule">
             <i class="far fa-calendar"></i> Quản lý lịch học
           </router-link>
@@ -36,13 +41,13 @@
           </router-link>
         </li>
         <li>
-          <router-link to="/resources">
-            <i class="fas fa-book"></i> Quản lý tài nguyên
+          <router-link to="/room">
+            <i class="fa-solid fa-hotel"></i> Quản lý phòng học 
           </router-link>
         </li>
       </ul>
     </nav>
-    <div v-if="authStore.isLoggedIn" class="logout-btn">
+    <div v-if="authStore.isLoggedIn" class="logout-btn d-flex justify-content-center">
       <button class="btn btn-secondary" @click="logoutClick">Logout</button>
     </div>
   </div>

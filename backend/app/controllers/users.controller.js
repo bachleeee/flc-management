@@ -51,7 +51,7 @@ exports.loginUser = async (req, res, next) => {
     name: user.name,
     email: user.email,
     phone: user.phone,
-    token: generateToken(user?._id),  
+    token: generateToken(user?._id),
   });
 };
 
@@ -109,7 +109,6 @@ exports.update = async (req, res, next) => {
     email: req.body.email,
     phone: req.body.phone,
     address: req.body.address,
-    classid: req.body.classid,
   };
   try {
     const document = await userService.update(id, _data);
@@ -119,6 +118,36 @@ exports.update = async (req, res, next) => {
     return res.send(document);
   } catch (error) {
     next(new ApiError(`An error accurred while updating user ${id}`, 500));
+  }
+};
+exports.addMyClass = async (req, res, next) => {
+  if (Object.keys(req.body).length === 0) {
+    return next(new ApiError("Update data cannot be empty", 400));
+  }
+
+  const tenHocVien = req.body.tenHocVien;
+  const hinhthuc = req.body.hinhthuc;
+  const studentData = await userService.findOneByName(tenHocVien);
+
+  let ngayhethan;
+
+  if (hinhthuc == 'offline') {
+    ngayhethan = new Date(req.body.ngayketthuc);
+  } else {
+    const ngayDangKy = new Date(req.body.ngayDangKy);
+    ngayhethan = new Date(ngayDangKy.setDate(ngayDangKy.getDate() + 6 * 30)); 
+  }
+  
+  try {
+    const data = {
+      className: req.body.className,
+      ngayHetHan: ngayhethan 
+    };
+    const document = await userService.addToClass(studentData._id, data);
+
+    return res.send(document);
+  } catch (error) {
+    next(new ApiError(`Lỗi thêm lớp cho học viên ${tenHocVien}`, 500));
   }
 };
 
@@ -149,7 +178,7 @@ exports.deleteAllUsers = async (req, res, next) => {
 };
 
 exports.logoutUser = async (req, res, next) => {
-  
+
   res.json({ message: "Logout successful" });
 };
 
@@ -159,7 +188,7 @@ exports.addtoCart = async (req, res, next) => {
   try {
     const user = await userService.findById(id);
     let getCourse = await productService.findById(courseid);
-      
+
     let newCart = ({
       getCourse,
       orderby: user?._id,
@@ -203,31 +232,30 @@ exports.getUserCart = async (req, res, next) => {
   }
 };
 
-exports.createOrder = async (req, res,next) => {
-  const {id} = req.user;
-  const {classid,total,voucher} = req.body;
+exports.createOrder = async (req, res, next) => {
+  const { id } = req.user;
+
   try {
     const user = await userService.findById(id);
 
-    let getClass = await classService.findById(classid);
-    let getCourse = await productService.findById(getClass.courseid);
-    
-    let newRegister = ({
-      courseid : getCourse._id,
-      orderby: user._id,
+    const currentDate = new Date();
+
+    let newRegister = {
+      ...req.body,
+      orderby: user.name,
       orderStatus: "waiting",
-      classid,
-      voucher,
-      total,
-    })
+      createdAt: currentDate
+    };
 
     const savedRegister = await orderService.createOrder(newRegister);
 
-    return res.send(savedRegister)
+    return res.send(savedRegister);
   } catch (error) {
-    next(new ApiError("Lỗi tạo phiếu đăng ký"))
+    next(new ApiError("Lỗi tạo phiếu đăng ký"));
   }
 };
+
+
 exports.ApplyVoucher = async (req, res, next) => {
   const { voucher, courseid } = req.body;
   try {
@@ -241,7 +269,7 @@ exports.ApplyVoucher = async (req, res, next) => {
         return res.status(404).send("Không tìm thấy voucher");
       }
 
-      const total = getCourse.price - getCourse.price * getVoucher.giagiam;
+      const total = getCourse.price - getCourse.price * getVoucher.giamgia;
 
       return res.send({ total });
     }
@@ -346,7 +374,7 @@ exports.reduceProductQuantity = async (req, res, next) => {
   const _data = {
     quantity: newQuantity
   }
-  
+
   try {
     const document = await productService.update(product_id, _data);
     if (!document) {
@@ -374,7 +402,7 @@ exports.addTeacher = async (req, res, next) => {
 };
 
 exports.createDegree = async (req, res, next) => {
-  const {userid} = user.req;
+  const { userid } = user.req;
   try {
     const _data = {
       ...req.body,
@@ -385,13 +413,13 @@ exports.createDegree = async (req, res, next) => {
 
     return res.send(document);
 
-  } catch(error) {
+  } catch (error) {
     next(new ApiError("An error occurred while creating", 500));
   }
 }
 
 exports.createExp = async (req, res, next) => {
-  const {userid} = user.req;
+  const { userid } = user.req;
   try {
     const _data = {
       ...req.body,
@@ -402,7 +430,7 @@ exports.createExp = async (req, res, next) => {
 
     return res.send(document);
 
-  } catch(error) {
+  } catch (error) {
     next(new ApiError("An error occurred while creating", 500));
   }
 }

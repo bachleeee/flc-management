@@ -9,6 +9,9 @@ class ClassService {
     async getAllClass() {
         return (await this.api.get(`/`)).data;
     }
+    async getAllOffClass(data) {
+        return (await this.api.get(`/findAllOfClass`, data)).data;
+    }
     async getClass(name) {
         return (await this.api.get(`/${name}`)).data;
     }
@@ -18,8 +21,11 @@ class ClassService {
     async create(data) {
         return (await this.api.post("/", data)).data;
     }
-    async createClassSchedule(id) {
-        return (await this.api.post(`/schedule/${id}`)).data;
+    async addToClass(data) {
+        return (await this.api.post("/addtoclass", data)).data;
+    }
+    async createClassSchedule(id,data) {
+        return (await this.api.post(`/schedule/${id}`,data)).data;
     }
     async getById(id) {
         return (await this.api.get(`/${id}`)).data;
@@ -29,6 +35,9 @@ class ClassService {
     }
     async delete(id) {
         return (await this.api.delete(`/${id}`)).data;
+    }
+    async deleteClassSchedule(id) {
+        return (await this.api.delete(`/schedule/${id}`)).data;
     }
 }
 export default new ClassService();

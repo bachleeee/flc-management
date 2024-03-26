@@ -29,24 +29,24 @@
                     </thead>
                     <tbody>
                       <tr>
-                        <th>SÁNG</th> <!-- Buổi sáng -->
-                        <th v-for="(week, index) in thisWeek" :key="'morning-' + index">
-                          <ScheduleList :thisWeek="week" @nextWeek="nextWeekHandler" @prevWeek="prevWeekHandler"
-                            :classColor="classColor" buoi="morning"></ScheduleList>
+                        <th>SÁNG 8h-12h</th> <!-- Buổi sáng -->
+                        <th v-for="(date, index) in thisWeek" :key="'morning-' + index">
+                          <ScheduleList :thisWeek="date" @nextWeek="nextWeekHandler" @prevWeek="prevWeekHandler"
+                            :classColor="classColor" buoi="morning" :daysOff="daysOff"></ScheduleList>
                         </th>
                       </tr>
                       <tr>
-                        <th>CHIỀU</th> <!-- Buổi trưa -->
-                        <th v-for="(week, index) in thisWeek" :key="'afternoon-' + index">
-                          <ScheduleList :thisWeek="week" @nextWeek="nextWeekHandler" @prevWeek="prevWeekHandler"
-                            :classColor="classColor" buoi="afternoon"></ScheduleList>
+                        <th>CHIỀU 13h30-17h30</th> <!-- Buổi trưa -->
+                        <th v-for="(date, index) in thisWeek" :key="'afternoon-' + index">
+                          <ScheduleList :thisWeek="date" @nextWeek="nextWeekHandler" @prevWeek="prevWeekHandler"
+                            :classColor="classColor" :daysOff="daysOff" buoi="afternoon"></ScheduleList>
                         </th>
                       </tr>
                       <tr>
-                        <th>TỐI</th> <!-- Buổi tối -->
-                        <th v-for="(week, index) in thisWeek" :key="'evening-' + index">
-                          <ScheduleList :thisWeek="week" @nextWeek="nextWeekHandler" @prevWeek="prevWeekHandler"
-                            :classColor="classColor" buoi="evening"></ScheduleList>
+                        <th>TỐI 18h-21h</th> <!-- Buổi tối -->
+                        <th v-for="(date, index) in thisWeek" :key="'evening-' + index">
+                          <ScheduleList :thisWeek="date" @nextWeek="nextWeekHandler" @prevWeek="prevWeekHandler"
+                            :classColor="classColor" :daysOff="daysOff" buoi="evening"></ScheduleList>
                         </th>
                       </tr>
                     </tbody>
@@ -59,16 +59,52 @@
                 </div>
                 <div class="col-2">
                   <h5 class="">Danh sách lớp học</h5>
-                  <div class=" rounded p-1 bg-grey ">
-                    <div class="classItems py-4 " v-for="(classItem, index) in allClasses" :key="index"
-                      :style="{ backgroundColor: getColor(index) }">
-                      {{ classItem.tenlop }}
+                  <div class=" rounded p-1 bg-grey " style="height: 300px; overflow-y: auto;">
+                    <div class="classItems py-3 d-flex justify-content-between rounded mt-1" v-for="(classItem, index) in allClasses"
+                      :key="index" :style="{ backgroundColor: getColor(index) }">
+                      <div class="px-2">
+                        {{ classItem.tenlop }}
+                      </div>
                       <!-- Kiểm tra xem có classname nào không khớp -->
                       <button class="btn btn-primary px-1 py-0"
                         v-if="shouldShowButton(classItem.tenlop) && classItem.hinhthuc == 'offline'"
-                        @click="createScheduleHandler(classItem._id)">
+                        @click="showForm[classItem._id] = true">
                         <i class="fa-thin fa-plus"></i>
                       </button>
+                      <button class="btn btn-danger px-1 py-0 " v-else @click="deleteAllClassSchedule(classItem._id)">
+                        <i class="fa-solid fa-x"></i>
+                      </button>
+                      <!-- Form cho từng lớp học -->
+                      <div class="form-wrapper" v-if="showForm[classItem._id]">
+                        <div class="form" style="z-index: 999;">
+                          <div>
+                            <label for="soluong">Số lượng tối đa của lớp</label>
+                            {{ classItem.soluongtoida }}
+                          </div>
+                          <div>
+                            <label for="phong">Chọn phòng</label>
+                            <select v-model="selectedRoom">
+                              <option v-for="room in rooms" :value="room">{{ room.sophong }} - Sức chứa: {{ room.succhua
+                                }}</option>
+                            </select>
+                          </div>
+                          <div class="mt-3">
+                            <button class="btn btn-primary mr-4"
+                              @click="createScheduleHandler(classItem._id)">Submit</button>
+                            <button class="btn btn-danger" @click="showForm[classItem._id] = false">Đóng</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <h5 class="">Lịch nghỉ</h5>
+                  <div class=" rounded p-1 bg-grey " style="height: 300px; overflow-y: auto;">
+                    <div class="classItems py-3 d-flex justify-content-between rounded" v-for="(dayOffItems, index) in daysOff"
+                      :key="index" style="background-color: white;">
+                      <div class="px-2">
+                        {{ dayOffItems.noiDung }}
+                      </div>
+                        
                     </div>
                   </div>
                 </div>
@@ -84,6 +120,7 @@
 <script>
 import ScheduleList from "@/components/ScheduleList.vue";
 import ScheduleService from '@/services/schedule.service';
+import RoomService from '@/services/room.service';
 import ClassService from '@/services/class.service';
 import { useAuthStore } from "@/store/auth";
 import moment from "moment";
@@ -102,13 +139,18 @@ export default {
       allSchedules: [],
       allClasses: [],
       colors: ['#FFD1DC ', '#ADD8E6 ', '#FFFACD', '#98FB98', '#B19CD9', '#FFD700', '#F6F193', '#C5EBAA', '#F6F193', '#F2C18D'], // Thay đổi màu sắc theo ý muốn
-      classColor: []
+      classColor: [],
+      showForm: {},
+      rooms: [],
+      selectedRoom: null,
+      daysOff: []
     };
   },
   computed: {
     authStore() {
       return useAuthStore();
     },
+
   },
   mounted() {
     this.fillTableWithDates();
@@ -141,7 +183,21 @@ export default {
         console.log(error);
       }
     },
-
+    async getAllRoom() {
+      try {
+        this.rooms = await RoomService.getAllRoom();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getAllDaysOff() {
+      try {
+        this.daysOff = await ScheduleService.getAllDaysOff();
+        console.log(this.daysOff)
+      } catch (error) {
+        console.log(error);
+      }
+    },
     fillTableWithDates() {
       const table = this.$refs.scheduleTable;
 
@@ -201,8 +257,10 @@ export default {
     },
     async createScheduleHandler(classId) {
       try {
-
-        const response = await ClassService.createClassSchedule(classId);
+        const data = {
+          phong: this.selectedRoom.sophong
+        }
+        const response = await ClassService.createClassSchedule(classId, data);
         if (response.success) {
           console.log("Lịch học đã được tạo thành công!");
         } else {
@@ -214,10 +272,31 @@ export default {
         console.error("Đã xảy ra lỗi khi tạo lịch học:", error);
       }
     },
+    async deleteAllClassSchedule(classId) {
+      if (confirm("Bạn có chắc muốn xóa tất cả lịch học của lớp này không?")) {
+        try {
+          const response = await ClassService.deleteClassSchedule(classId);
+
+          window.alert("Lịch học đã được xóa thành công!");
+          this.$router.go(0);
+
+
+        } catch (error) {
+          console.error("Đã xảy ra lỗi khi xóa lịch học:", error);
+          window.alert("Đã xảy ra lỗi khi xóa lịch học!");
+        }
+      }
+    },
+    showCreateClassScheduleFrom() {
+      this.showForm = true
+    }
   },
   mounted() {
     this.getAllSchedules()
     this.getAllClasses()
+    this.getAllRoom()
+    this.getAllDaysOff() 
+
   }
 };
 </script>
@@ -248,7 +327,41 @@ table thead th {
 
 .classItems {
   color: rgb(70, 70, 70);
-  font-weight: bold;
+  font-weight: 500;
+  font-size: 16px;
+}
 
+.form-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form {
+  background-color: white;
+  padding: 50px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+::-webkit-scrollbar {
+  width: 4px; /* Chiều rộng của thanh cuộn */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3); 
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.1); 
 }
 </style>

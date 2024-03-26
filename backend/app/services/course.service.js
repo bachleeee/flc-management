@@ -29,7 +29,7 @@ class ProductService {
     return result;
   }
 
-  async findAllPaged() {
+  async findAll() {
     try {
       const products = await this.databaseSetvices.course.find().toArray();
       return products;
@@ -38,13 +38,13 @@ class ProductService {
     }
   }
   
-  async findByNamePaged(name) {
+  async findByName(name) {
     try {
+      const escapedName = name.replace(/\s/g, "\\s"); // Thêm dấu escape trước các khoảng trắng
       const products = await this.databaseSetvices.course
         .find({
           name: {
-            $regex: new RegExp(name),
-            $options: "i",
+            $regex: new RegExp(escapedName, "i"), // Sử dụng biến escapedName để tìm kiếm
           },
         })
         .toArray();
@@ -53,6 +53,7 @@ class ProductService {
       throw new Error(error);
     }
   }
+  
   
   // async findByCategoryPaged(category, page, limit) {
   //   try {

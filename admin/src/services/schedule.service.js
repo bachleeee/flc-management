@@ -21,5 +21,8 @@ class scheduleService {
     async delete(id) {
         return (await this.api.delete(`/${id}`)).data;
     }
+    async getAllDaysOff() {
+        return (await this.api.get("/daysoff")).data;
+    }
 }
 export default new scheduleService();

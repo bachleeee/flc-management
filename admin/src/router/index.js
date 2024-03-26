@@ -7,9 +7,18 @@ import Class from '@/views/Class.vue';
 import ClassEdit from '@/views/ClassEdit.vue';
 import Schedule from '@/views/Schedule.vue';
 import ScheduleEdit from '@/views/ScheduleEdit.vue';
+import Room from '@/views/Room.vue';
+import RoomEdit from '@/views/RoomEdit.vue';
+import Lesson from '@/views/Lesson.vue';
+import LessonEdit from '@/views/LessonEdit.vue';
+import Video from '@/views/Video.vue';
+import VideoEdit from '@/views/VideoEdit.vue';
+import Exam from '@/views/Exam.vue';
+import ExamEdit from '@/views/ExamEdit.vue';
+import Order from '@/views/Order.vue';
+import OrderEdit from '@/views/OrderEdit.vue';
 import Login from '@/views/Login.vue';
 import Product from '@/views/Product.vue';
-import Order from '@/views/Order.vue';
 const routes = [
     {
         path: "/user",
@@ -76,19 +85,83 @@ const routes = [
         props: true
     },
     {
-        path: "/",
-        name: "login",
-        component: Login,
+        path: "/room",
+        name: "room",
+        component: Room,
     },
     {
-        path: "/product",
-        name: "product",
-        component: Product,
+        path: "/room/:id",
+        name: "room.edit",
+        component: RoomEdit,
+    },
+    {
+        path: "/room.add",
+        name: "room.add",
+        component: () => import("@/views/RoomAdd.vue"),
+        props: true
+    },
+    {
+        path: "/lesson",
+        name: "lesson",
+        component: Lesson,
+    },
+    {
+        path: "/lesson/:id",
+        name: "lesson.edit",
+        component: LessonEdit,
+    },
+    {
+        path:"/lesson.add",
+        name: "lesson.add",
+        component: () => import("@/views/LessonAdd.vue"),
+        props: true
+    },
+    {
+        path: "/video/:lessonid",
+        name: "video",
+        component: Video,
+    },
+    {
+        path: "/video/:id",
+        name: "video.edit",
+        component: VideoEdit,
+    },
+    {
+        path:"/video.add/:lessonid",
+        name: "video.add",
+        component: () => import("@/views/VideoAdd.vue"),
+        props: true
+    },
+    {
+        path: "/exam",
+        name: "exam",
+        component: Exam,
+    },
+    {
+        path: "/exam/:id",
+        name: "exam.edit",
+        component: ExamEdit,
+    },
+    {
+        path:"/exam.add",
+        name: "exam.add",
+        component: () => import("@/views/ExamAdd.vue"),
+        props: true
+    },
+    {
+        path: "/order/:id",
+        name: "order.edit",
+        component: OrderEdit,
     },
     {
         path: "/order",
         name: "order",
         component: Order,
+    }, 
+    {
+        path: "/",
+        name: "login",
+        component: Login,
     },
     {
         path: "/products/:id",

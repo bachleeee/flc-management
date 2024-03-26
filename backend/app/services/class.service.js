@@ -44,16 +44,15 @@ class GroupService {
     return result;
   }
 
-  async findAllPaged(page, limit) {
+  async findAll() {
     try {
-      const skip = (page - 1) * limit;
-      const groups = await this.databaseSetvices.class.find().skip(skip).limit(limit).toArray();
+      const groups = await this.databaseSetvices.class.find().toArray();
       return groups;
     } catch (error) {
       throw new Error(error);
     }
   }
-  
+
   async findByCourseId(courseid) {
     try {
       const group = await this.databaseSetvices.class.find({
@@ -95,15 +94,12 @@ class GroupService {
     }
   }
   
-  async findByCategoryPaged(category, page, limit) {
+  async findByCourseName(courseName) {
     try {
-      const skip = (page - 1) * limit;
       const groups = await this.databaseSetvices.class
         .find({
-          category: category,
+          courseName: courseName,
         })
-        .skip(skip)
-        .limit(limit)
         .toArray();
       return groups;
     } catch (error) {
@@ -169,10 +165,10 @@ class GroupService {
     }
   }
   
-  async findByname(name) {
+  async findByname(tenlop) {
     try {
       const group = await this.databaseSetvices.class.findOne({
-        tenlop: name,
+        tenlop: tenlop,
       });
       return group;
     } catch (error) {
@@ -254,14 +250,14 @@ class GroupService {
     }
   }
   
-  async addToClass(userId, classId) {
+  async addToClass(classId, tenHocVien) {
     const filter = {
       _id: new ObjectId(classId),
     };
   
     const update = {
       $addToSet: {
-        students: userId,
+        students: tenHocVien,
       },
     };
   
@@ -270,16 +266,34 @@ class GroupService {
     };
   
     try {
-      const updatedClass = await this.databaseSetvices.class.findOneAndUpdate(
+      let updatedClass = await this.databaseSetvices.class.findOne(filter);
+  
+      if (!updatedClass) {
+        throw new Error('Class not found');
+      }
+  
+      if (!updatedClass.students) {
+        // Nếu mảng students không tồn tại, tạo một mảng mới chứa học viên mới
+        updatedClass.students = [tenHocVien];
+      } else {
+        // Nếu mảng students đã tồn tại, thêm học viên mới vào mảng đó
+        updatedClass.students.push(tenHocVien);
+      }
+  
+      updatedClass = await this.databaseSetvices.class.findOneAndUpdate(
         filter,
-        update,
+        {
+          $set: updatedClass,
+        },
         options
       );
+  
       return updatedClass;
     } catch (error) {
       throw new Error(error);
     }
   }
+  
 }
 const databaseSetvices = require("../utils/mongodb.util");
 const groupService = new GroupService(databaseSetvices);

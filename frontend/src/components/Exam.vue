@@ -1,16 +1,31 @@
 <template>
-  <div v-if="exams.length > 0">
+  <div>
     <div v-for="(exam, index) in exams" :key="index">
-      <ExamDetail :exam="exam" :exerciseIndex="index + 1" :showingAnswers="showingAnswers"></ExamDetail>
+      <div v-if="exam.type === 'multiple_choice'">
+        <div>Exercise {{ index + 1 }}: {{ exam.question }}</div>
+        <ul>
+          <li v-for="(option, optionIndex) in ['A', 'B', 'C', 'D']" :key="optionIndex" :class="{
+      'correct': showingAnswers && selectedOptions[index] === exam.correctOption && selectedOptions[index] === option,
+      'incorrect': showingAnswers && selectedOptions[index] !== exam.correctOption && selectedOptions[index] === option,
+      'default': !showingAnswers && selectedOptions[index] === option
+    }">
+            <input type="radio" :value="option" v-model="selectedOptions[index]" :disabled="showingAnswers" />
+            {{ option }}. {{ exam['option' + option] }}
+          </li>
+        </ul>
+        <div v-if="showingAnswers">Đáp án: {{ exam.correctOption }}</div>
+      </div>
     </div>
     <div>
-        <button class="btn btn-primary" @click="showAnswers">Xem đáp án</button>
+      <button v-if="this.myProgress.status !== 'completed'" class="btn btn-primary" @click="showAnswers">Xem đáp án</button>
+      <button v-else class="btn btn-primary" @click="reDoExam">Làm lại</button>
     </div>
   </div>
 </template>
 
 <script>
-import LessonService from "@/service/lesson.service";
+import ExamService from "@/service/exam.service";
+import ProgressService from "@/service/progress.service";
 import ExamDetail from "./ExamDetail.vue";
 
 export default {
@@ -21,29 +36,69 @@ export default {
     return {
       exams: [],
       showingAnswers: false,
+      selectedOptions: [] // Mảng lưu đáp án đã chọn cho từng bài tập
     };
   },
   props: {
-    lesson: Object
+    lesson: Object,
+    myProgress: Object
   },
   created() {
-    this.getExams(); 
+    this.getExams();
   },
   methods: {
-    async getExams() { 
+    async getExams() {
       try {
-        const response = await LessonService.getEx(this.lesson._id);
+        const response = await ExamService.getAllExamOfLesson(this.lesson._id);
         if (response) {
-          this.exams = response; // Sửa thành this.exams
+          this.exams = response;
+          if (this.myProgress.status === 'completed') {
+            this.selectedOptions = this.myProgress.selectedOptions
+            this.showingAnswers = true
+          } else {
+            this.selectedOptions = Array(this.exams.length).fill('');
+          }
           console.log("Bài tập cho bài học:", this.exams);
         }
       } catch (error) {
         console.error("Lỗi khi lấy bài tập:", error);
       }
     },
-    showAnswers() {
-            this.showingAnswers = true;
-        }
+    async showAnswers() {
+      this.showingAnswers = true;
+      await this.updateProgress();
+    },
+    async updateProgress() {
+      try {
+        const data = {
+          satus: "completed",
+          selectedOptions: this.selectedOptions // Chuyển dữ liệu vào trong một đối tượng có tên là selectedOptions
+        };
+        await ProgressService.update(this.myProgress._id, data);
+        console.log("Đã cập nhật tiến độ thành công!");
+      } catch (error) {
+        console.error("Lỗi khi cập nhật tiến độ:", error);
+      }
+    }
+
   }
 };
 </script>
+
+<style scoped>
+li {
+  list-style-type: none;
+}
+
+.correct {
+  color: green;
+}
+
+.incorrect {
+  color: red;
+}
+
+.default {
+  color: black;
+}
+</style>

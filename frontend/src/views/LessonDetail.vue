@@ -8,7 +8,7 @@
     </div>
     <div class="container">
       <div v-if="activeTab === 'exercise'">
-        <Exam :lesson="lesson" />
+        <Exam :lesson="lesson" :myProgress="myProgress" />
       </div>
       <div v-if="videos.length > 0 && activeTab === 'lesson'">
         <h5 style="color:rgb(255, 255, 255)" class="d-flex justify-content-center pt-3">{{ lesson.name }}</h5>
@@ -44,8 +44,10 @@
 
 <script>
 import LessonService from "@/service/lesson.service";
+import ProgressService from "@/service/progress.service";
 import { useAuthStore } from "@/store/auth";
 import Exam from "@/components/Exam.vue";
+import Cookies from 'js-cookie';
 
 export default {
   components: {
@@ -59,6 +61,7 @@ export default {
       currentVideoIndex: 0,
       activeTab: 'lesson',
       exams: [],
+      myProgress: null
     };
   },
   computed: {
@@ -68,37 +71,62 @@ export default {
   },
   methods: {
     async getLesson() {
-      try {
-        const slug = this.$route.params.lessonName;
-        const response = await LessonService.getBySlug(slug);
-
-        if (response) {
-          this.lesson = response;
-          console.log("Thông tin bài học:", this.lesson);
-
-          const responseDoc = await LessonService.getDoc(response._id);
-          if (responseDoc) {
-            this.documents = responseDoc;
-            console.log("Dữ liệu tài liệu:", this.documents);
-          } else {
-            console.error("Không tìm thấy thông tin tài liệu.");
-          }
-
-          const responseVid = await LessonService.getVid(response._id);
-          if (responseVid) {
-            this.videos = responseVid;
-            console.log("Dữ liệu video:", this.videos);
-          } else {
-            console.error("Không tìm thấy thông tin video.");
-          }
-
-        } else {
-          console.error("Không tìm thấy thông tin bài học.");
-        }
-      } catch (error) {
-        console.error("Lỗi khi lấy thông tin bài học:", error);
+    try {
+      const slug = this.$route.params.lessonName;
+      const response = await LessonService.getBySlug(slug);
+      if (response) {
+        this.lesson = response;
+        await this.getProgress();
+        await this.getDocuments();
+        await this.getVideos();
+      } else {
+        console.error("Không tìm thấy thông tin bài học.");
       }
-    },
+    } catch (error) {
+      console.error("Lỗi khi lấy thông tin bài học:", error);
+    }
+  },
+  async getProgress() {
+    try {
+      const cookieValue = Cookies.get('token');
+      const classid = null;
+      const responseProgress = await ProgressService.getMyProgress(cookieValue,classid, this.lesson._id);
+      if (responseProgress) {
+        this.myProgress = responseProgress;
+        console.log("Dữ liệu tiến độ:", this.myProgress);
+      } else {
+        console.error("Không tìm thấy thông tin tiến độ.");
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy thông tin tiến độ:", error);
+    }
+  },
+  async getDocuments() {
+    try {
+      const responseDoc = await LessonService.getDoc(this.lesson._id);
+      if (responseDoc) {
+        this.documents = responseDoc;
+        console.log("Dữ liệu tài liệu:", this.documents);
+      } else {
+        console.error("Không tìm thấy thông tin tài liệu.");
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy thông tin tài liệu:", error);
+    }
+  },
+  async getVideos() {
+    try {
+      const responseVid = await LessonService.getVid(this.lesson._id);
+      if (responseVid) {
+        this.videos = responseVid;
+        console.log("Dữ liệu video:", this.videos);
+      } else {
+        console.error("Không tìm thấy thông tin video.");
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy thông tin video:", error);
+    }
+  },
     nextVideo() {
       if (this.currentVideoIndex < this.videos.length - 1) {
         this.currentVideoIndex += 1;

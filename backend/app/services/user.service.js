@@ -37,6 +37,16 @@ class UserService {
       throw new Error(error);
     }
   }
+  async findAllOfClass(className) {
+    try {
+      const users = await this.databaseSetvices.users.find().toArray();
+      const usersWithClass = users.filter(user => user.myClass && user.myClass.some(classItem => classItem.className === className));
+      return usersWithClass;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  
 
   async findByName(name) {
     try {
@@ -54,6 +64,16 @@ class UserService {
     }
   }
   
+  async findOneByName(name) {
+    try {
+      const user = await this.databaseSetvices.users.findOne({
+       name:name,
+      });
+      return user;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
   async findById(id) {
     try {
       const user = await this.databaseSetvices.users.findOne({
@@ -86,6 +106,50 @@ class UserService {
       throw new Error(error);
     }
   }
+
+  async addToClass(id, data) {
+    const filter = {
+      _id: new ObjectId(id),
+    };
+  
+    const update = {
+      $push: {
+        myClass: data,
+      },
+    };
+    const options = {
+      returnDocument: 'after',
+    };
+    try {
+      let updatedUser = await this.databaseSetvices.users.findOne(filter);
+  
+      if (!updatedUser) {
+        // Nếu không tìm thấy người dùng, bạn có thể xử lý theo ý của mình, ví dụ như ném ra một lỗi
+        throw new Error('User not found');
+      }
+  
+      if (!updatedUser.myClass) {
+        // Nếu mảng myClass không tồn tại, tạo một mảng mới chứa dữ liệu của lớp học mới
+        updatedUser.myClass = [data];
+      } else {
+        // Nếu mảng myClass đã tồn tại, thêm dữ liệu của lớp học mới vào mảng đó
+        updatedUser.myClass.push(data);
+      }
+  
+      updatedUser = await this.databaseSetvices.users.findOneAndUpdate(
+        filter,
+        {
+          $set: updatedUser,
+        },
+        options
+      );
+  
+      return updatedUser;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  
   
   async addCart(id, products) {
     const filter = {

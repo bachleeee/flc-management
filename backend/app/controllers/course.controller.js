@@ -19,18 +19,12 @@ exports.createProduct = async (req, res, next) => {
 exports.findAll = async (req, res, next) => {
   let documents = [];
   try {
-    const { name, category } = req.query;
-  
+    const { name } = req.query;
 
-    if (name && category) {
-      documents = await productService.findByNameAndCategoryPaged(
-        name,
-        category
-      );
-    } else if (name) {
-      documents = await productService.findByNamePaged(name );
+    if (name) {
+      documents = await productService.findByName(name);
     } else {
-      documents = await productService.findAllPaged();
+      documents = await productService.findAll();
     }
   } catch (error) {
     next(new ApiError("An error occurred while retrieving products", 500));
@@ -134,7 +128,7 @@ exports.createCat = async (req, res, next) => {
 };
 
 exports.addToCourse = async (req, res, next) => {
-  const {userid, courseid} = req.body
+  const { userid, courseid } = req.body
   try {
     result = await productService.addToCourse(userid, courseid)
     return res.send(result);

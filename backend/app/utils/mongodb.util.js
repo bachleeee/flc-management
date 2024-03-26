@@ -40,6 +40,9 @@ class DatabaseServices {
   get schedule() {
     return this.db.collection("schedule");
   }
+  get dayoff() {
+    return this.db.collection("dayoff");
+  }
   get lesson() {
     return this.db.collection("lesson");
   }

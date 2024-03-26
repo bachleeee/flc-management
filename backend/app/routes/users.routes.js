@@ -23,7 +23,8 @@ const {
   createDegree,
   createExp,
   ApplyVoucher,
-  addToClass
+  addToClass,
+  addMyClass
 } = require("../controllers/users.controller");
 
 const router = express.Router();
@@ -36,7 +37,7 @@ router.route('/cart').delete(authenticateToken,deleteuserCart);
 
 router.route('/order').post(authenticateToken,createOrder);
 router.route('/order').get(authenticateToken,getUserOrder);
-router.route('/order/getall').get(getAllOrder);
+router.route('/order').get(getAllOrder);
 router.route('/order').delete(authenticateToken,deleteUserOrder);
 router.route('/order').put(updateOrderStatus);
 
@@ -56,5 +57,5 @@ router.route('/teacher').post(addTeacher)
 router.route('/teacher/degree').post(authenticateToken,createDegree)
 router.route('/teacher/exp').post(authenticateToken,createExp)
 
-
+router.route('/class').post(addMyClass)
 module.exports = router;

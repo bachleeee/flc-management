@@ -88,19 +88,17 @@ class GroupService {
     }
   }
 
-  async findAllPaged(page, limit) {
+  async findAll() {
     try {
-      const skip = (page - 1) * limit;
-      const lesson = await this.databaseSetvices.lesson.find().skip(skip).limit(limit).toArray();
+      const lesson = await this.databaseSetvices.lesson.find().toArray();
       return lesson;
     } catch (error) {
       throw new Error(error);
     }
   }
   
-  async findByNamePaged(name, page, limit) {
+  async findByName(name) {
     try {
-      const skip = (page - 1) * limit;
       const lesson = await this.databaseSetvices.lesson
         .find({
           name: {
@@ -108,8 +106,6 @@ class GroupService {
             $options: "i",
           },
         })
-        .skip(skip)
-        .limit(limit)
         .toArray();
       return lesson;
     } catch (error) {
@@ -117,42 +113,6 @@ class GroupService {
     }
   }
   
-  async findByCategoryPaged(category, page, limit) {
-    try {
-      const skip = (page - 1) * limit;
-      const lesson = await this.databaseSetvices.lesson
-        .find({
-          category: category,
-        })
-        .skip(skip)
-        .limit(limit)
-        .toArray();
-      return lesson;
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
-  
-  async findByNameAndCategoryPaged(name, category, page, limit) {
-    try {
-      const skip = (page - 1) * limit;
-      const lesson = await this.databaseSetvices.lesson
-        .find({
-          name: {
-            $regex: new RegExp(name),
-            $options: "i",
-          },
-          category: category,
-        })
-        .skip(skip)
-        .limit(limit)
-        .toArray();
-      return lesson;
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
-
   async findBySlug(slug) {
     try {
       const group = await this.databaseSetvices.lesson.findOne({
@@ -167,6 +127,45 @@ class GroupService {
   async findById(id) {
     try {
       const group = await this.databaseSetvices.lesson.findOne({
+        _id: new ObjectId(id),
+      });
+      if (!group) {
+        return null;
+      }
+      return group; 
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async findExamById(id) {
+    try {
+      const group = await this.databaseSetvices.exam.findOne({
+        _id: new ObjectId(id),
+      });
+      if (!group) {
+        return null;
+      }
+      return group; 
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async findVidById(id) {
+    try {
+      const group = await this.databaseSetvices.video.findOne({
+        _id: new ObjectId(id),
+      });
+      if (!group) {
+        return null;
+      }
+      return group; 
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+  async findDocById(id) {
+    try {
+      const group = await this.databaseSetvices.document.findOne({
         _id: new ObjectId(id),
       });
       if (!group) {
@@ -283,6 +282,28 @@ class GroupService {
       throw new Error(error);
     }
   }
+  async updateExam(id, updateGroup) {
+    const filter ={
+      _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
+    }
+    const update = this.extractGroupData(updateGroup);
+    const options = {
+      returnDocument: "after",
+    };
+
+    try {
+      const group = await this.databaseSetvices.exam.findOneAndUpdate(
+        filter,
+        {
+          $set: update,
+        },
+        options
+      );
+      return group;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 
   async deleteOne(id) {
     try {
@@ -322,10 +343,10 @@ class GroupService {
       throw new Error(error);
     }
   }
-  async findByClassId(classid) {
+  async findByClassName(className) {
     try {
       const group = await this.databaseSetvices.lesson.find({
-        classid: classid,
+        className: className,
       }).toArray();
       return group;
     } catch (error) {

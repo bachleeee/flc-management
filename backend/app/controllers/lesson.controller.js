@@ -90,36 +90,24 @@ exports.findOneEx = async (req, res, next) => {
 exports.findAll = async (req, res, next) => {
     let documents = [];
     try {
-        const { name, category, page, limit } = req.query;
+        const { name} = req.query;
 
-        const pageNumber = parseInt(page) || 1;
-        const limitNumber = parseInt(limit) || 10;
-
-        if (name && category) {
-            documents = await groupService.findByNameAndCategoryPaged(
-                name,
-                category,
-                pageNumber,
-                limitNumber
-            );
-        } else if (name) {
-            documents = await groupService.findByNamePaged(name, pageNumber, limitNumber);
-        } else if (category) {
-            documents = await groupService.findByCategoryPaged(category, pageNumber, limitNumber);
-        } else {
-            documents = await groupService.findAllPaged(pageNumber, limitNumber);
+      if (name) {
+            documents = await groupService.findByName(name);
+      }  else {
+            documents = await groupService.findAll();
         }
     } catch (error) {
-        next(new ApiError("An error occurred while retrieving groups", 500));
+        next(new ApiError("An error occurred while retrieving lesson", 500));
     }
     return res.send(documents);
 };
 
-exports.getLessonByClassId = async (req, res, next) => {
-    const { id } = req.params;
+exports.getLessonByClassName = async (req, res, next) => {
+    const { className } = req.params;
     try {
         let documents = [];
-        documents = await groupService.findByClassId(id);
+        documents = await groupService.findByClassName(className);
         return res.send(documents);
     } catch (error) {
         next(new ApiError(`An error accurred while retrieving class ${id}`, 500));
@@ -143,6 +131,54 @@ exports.findOne = async (req, res, next) => {
     const { id } = req.params;
     try {
         const document = await groupService.findById(id);
+        if (!document) {
+            return next(new ApiError(`Group with id ${id} not found`, 404));
+        }
+        return res.send(document);
+    } catch (error) {
+        next(new ApiError(`An error accurred while retrieving group ${id}`, 500));
+    }
+};
+exports.findOne = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const document = await groupService.findById(id);
+        if (!document) {
+            return next(new ApiError(`Group with id ${id} not found`, 404));
+        }
+        return res.send(document);
+    } catch (error) {
+        next(new ApiError(`An error accurred while retrieving group ${id}`, 500));
+    }
+};
+exports.findOneExam = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const document = await groupService.findExamById(id);
+        if (!document) {
+            return next(new ApiError(`Group with id ${id} not found`, 404));
+        }
+        return res.send(document);
+    } catch (error) {
+        next(new ApiError(`An error accurred while retrieving group ${id}`, 500));
+    }
+};
+exports.findOneDoc = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const document = await groupService.findDocById(id);
+        if (!document) {
+            return next(new ApiError(`Group with id ${id} not found`, 404));
+        }
+        return res.send(document);
+    } catch (error) {
+        next(new ApiError(`An error accurred while retrieving group ${id}`, 500));
+    }
+};
+exports.findOneVid = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const document = await groupService.findVidById(id);
         if (!document) {
             return next(new ApiError(`Group with id ${id} not found`, 404));
         }
@@ -176,7 +212,7 @@ exports.findAllVid = async (req, res, next) => {
     }
 };
 
-exports.findAllEx = async (req, res, next) => {
+exports.findAllExam = async (req, res, next) => {
     const { lessonid } = req.params;
     try {
         const document = await groupService.findExByLessonId(lessonid);
@@ -237,6 +273,22 @@ exports.updateVid = async (req, res, next) => {
         next(new ApiError(`An error accurred while updating group ${id}`, 500));
     }
 };
+exports.updateExam = async (req, res, next) => {
+    if (Object.keys(req.body).length === 0) {
+        return next(new ApiError("Update data cannot be empty", 400));
+    }
+    const { id } = req.params;
+    const _data = req.body;
+    try {
+        // const document = await groupService.updateExam(id, _data);
+        // if (!document) {
+        //     return next(new ApiError(`Group with id ${id} not found`, 404));
+        // }
+        return res.send(_data);
+    } catch (error) {
+        next(new ApiError(`An error accurred while updating group ${id}`, 500));
+    }
+};
 
 exports.deleteLesson = async (req, res, next) => {
     const { id } = req.params;
@@ -272,6 +324,20 @@ exports.deleteDoc = async (req, res, next) => {
     const { id } = req.params;
     try {
         const document = await groupService.deleteOneDoc(id);
+        if (!document) {
+            return next(new ApiError(`Group with id ${id} not found`, 404));
+        }
+        return res.send({
+            message: `Group with id ${id} was deleted successfully`,
+        });
+    } catch (error) {
+        next(new ApiError(`An error accurred while deleting group ${id}`, 500));
+    }
+};
+exports.deleteExam = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const document = await groupService.deleteOneExam(id);
         if (!document) {
             return next(new ApiError(`Group with id ${id} not found`, 404));
         }

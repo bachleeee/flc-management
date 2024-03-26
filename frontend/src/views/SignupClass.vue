@@ -32,7 +32,7 @@
                             <div class="thong-tin-khoa-hoc">
                                 <label class="nhan" for="">Học phí (tạm tính):</label>
                                 <label class="ten-dang-ky" for="" style="color: red;">{{ formatCurrency(myCourse.price)
-                                }}</label>
+                                    }}</label>
                             </div>
                             <div class="thong-tin-khoa-hoc">
                                 <label class="nhan" for="">Lịch học:</label>
@@ -77,18 +77,13 @@
                                 <label class="ten-dang-ky" for="">{{ authStore.user.phone }}</label>
                             </div>
                             <div class="thong-tin-khoa-hoc">
-                                <label class="nhan" for="">Giới tính:</label>
-                                <label class="ten-dang-ky" for="">{{ authStore.user.gioiTinh }}</label>
-                            </div>
-                            <div class="thong-tin-khoa-hoc">
                                 <label class="nhan" for="maUuDai">Mã ưu đãi (nếu có):</label>
                                 <input class="form" type="text" v-model="voucherCode" style="width: 120px;">
                                 <div class="ml-2 btn btn-primary" @click="applyVoucher">Xác nhận</div>
                             </div>
                             <div class="thong-tin-khoa-hoc">
                                 <label class="nhan" for="">Học phí:</label>
-                                <label v-if="total !== null" class="ten-dang-ky" for="" style="color">{{ formatCurrency(this.total)
-                                }}</label>
+                                <label v-if="total !== null" class="ten-dang-ky" for="" style="color">{{formatCurrency(this.total)}}</label>
                             </div>
                         </div>
                     </div>
@@ -123,9 +118,9 @@
                             </div>
                             <div class="thong-tin-khoa-hoc">
                                 <label class="nhan" for="">Học phí:</label>
-                                <label class="ten-dang-ky" for="" style="color: red;">{{ formatCurrency(this.total)
-                                }}</label>
+                                <label id="" class="ten-dang-ky">{{ formatCurrency(this.total) }}</label>
                             </div>
+
                         </div>
                     </div>
                     <div class="btn-bottom d-flex justify-content-between">
@@ -252,7 +247,8 @@ export default {
 
                 const data = {
                     total: this.total,
-                    classid: this.myClass._id,
+                    className: this.myClass.tenlop,
+                    courseName: this.myCourse.name,
                     voucher: this.voucherCode
                 }
 

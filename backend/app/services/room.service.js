@@ -19,7 +19,7 @@ class RoomService {
     const result = await this.databaseServices.room.findOneAndUpdate(
       room,
       {
-        $setOnInsert: {},
+        $setOnInsert: { tinhtrang: "tot"},
       },
       {
         upsert: true,

@@ -9,8 +9,8 @@ class CourseService {
     async getAllCourse(data) {
         return (await this.api.get("/", data)).data;
     }
-    async getAll(name,page, limit) {
-        return (await this.api.get(`/?name=${name}`,{ params: { page, limit } })).data;
+    async getByCourseName(name) {
+        return (await this.api.get(`/?name=${name}`)).data;
     }
     async getAllCat(cat, page, limit) {
         return (await this.api.get(`/?category=${cat}`, { params: { page, limit } })).data;

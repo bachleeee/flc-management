@@ -35,12 +35,12 @@
                                     <th scope="col" class="col-2">Trạng thái</th>
                                     <th scope="col" class="col-1">Thứ</th>
                                     <th scope="col" class="col-1">Giờ học</th>
-                                    <th scope="col" class="col-2"></th>
+                                    <th scope="col" class="col-3"></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <ClassList v-if="filteredCoursesCount > 0" :courses="paginatedCourses"
-                                    v-model:activeIndex="activeIndex" :start-index="startIndex" />
+                                    v-model:activeIndex="activeIndex" :start-index="startIndex" :users="users"/>
                                 <p v-else>Không có Lớp học.</p>
                             </tbody>
                             <tfoot>
@@ -75,6 +75,7 @@
 import InputSearch from "@/components/InputSearch.vue";
 import ClassList from "@/components/ClassList.vue";
 import ClassService from "@/services/class.service";
+import UserService from "@/services/user.service";
 import { useAuthStore } from '@/store/auth';
 
 export default {
@@ -90,7 +91,8 @@ export default {
             itemsPerPage: 7,
             currentPage: 1,
             sortDirection: 'asc',
-            sortField: 'name'
+            sortField: 'name',
+            users:[]
         };
     },
     watch: {
@@ -149,6 +151,13 @@ export default {
                 console.log(error);
             }
         },
+        async getAllUsers() {
+            try {
+                this.users = await UserService.getAllUser()
+            } catch (error) {
+                console.log(error);
+            }
+        },
         refreshList() {
             this.retrieveCourses();
             this.activeIndex = -1;
@@ -193,6 +202,7 @@ export default {
     },
     mounted() {
         this.refreshList();
+        this.getAllUsers();
     },
 
 };

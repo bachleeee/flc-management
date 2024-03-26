@@ -37,7 +37,7 @@ class ScheduleService {
       if (!schedule) {
         return null;
       }
-      return schedule; 
+      return schedule;
     } catch (error) {
       throw new Error(error);
     }
@@ -71,10 +71,10 @@ class ScheduleService {
     try {
       const startOfDay = new Date(date);
       startOfDay.setHours(0, 0, 0, 0);
-  
+
       const endOfDay = new Date(date);
       endOfDay.setHours(23, 59, 59, 999);
-  
+
       const schedule = await this.databaseServices.schedule
         .find({
           gioBatDau: {
@@ -83,21 +83,21 @@ class ScheduleService {
           },
         })
         .toArray();
-  
+
       return schedule;
     } catch (error) {
       throw new Error(error);
     }
   }
-  
-  async findAllByShiftAndDate(buoi,date) {
+
+  async findAllByShiftAndDate(buoi, date) {
     try {
       const startOfDay = new Date(date);
       startOfDay.setHours(0, 0, 0, 0);
-  
+
       const endOfDay = new Date(date);
       endOfDay.setHours(23, 59, 59, 999);
-  
+
       const schedule = await this.databaseServices.schedule
         .find({
           buoi: buoi,
@@ -107,13 +107,13 @@ class ScheduleService {
           },
         })
         .toArray();
-  
+
       return schedule;
     } catch (error) {
       throw new Error(error);
     }
   }
-  
+
   async deleteOneSchedule(schedule_id) {
     try {
       const schedule = await this.databaseServices.schedule.findOneAndDelete({
@@ -126,7 +126,7 @@ class ScheduleService {
   }
 
   async update(id, updateSchedule) {
-    const filter ={
+    const filter = {
       _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
     }
     const update = this.extractScheduleData(updateSchedule);
@@ -145,8 +145,53 @@ class ScheduleService {
     } catch (error) {
       throw new Error(error);
     }
-}
+  }
 
+  async findAllDaysOff() {
+    try {
+      const dayoff = await this.databaseServices.dayoff.find().toArray();
+      return dayoff;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async createDaysOff(data) {
+    const dayoff = this.extractScheduleData(data);
+    const result = await this.databaseServices.dayoff.findOneAndUpdate(
+      dayoff,
+      {
+        $setOnInsert: {},
+      },
+      {
+        upsert: true,
+        returnDocument: "after",
+      }
+    );
+    return result;
+  }
+
+  async updateDaysOff(id, updateSchedule) {
+    const filter = {
+      _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
+    }
+    const update = this.extractScheduleData(updateSchedule);
+    const options = {
+      returnDocument: "after",
+    };
+    try {
+      const dayoff = await this.databaseServices.dayoff.findOneAndUpdate(
+        filter,
+        {
+          $set: update,
+        },
+        options
+      );
+      return dayoff;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 }
 const databaseSetvices = require("../utils/mongodb.util");
 const scheduleService = new ScheduleService(databaseSetvices);
