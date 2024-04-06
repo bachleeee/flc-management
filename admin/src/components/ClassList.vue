@@ -26,10 +26,12 @@
       </button>
       <div v-if="showDetail[index]" class="class-detail">
         <div class="d-flex justify-content-center p-4" style="background-color: white; flex-direction: column;">
-          Danh sách học viên của lớp
+          Danh sách học viên của lớp:
           <ul>
-            <li v-for="(student, index) in getAllStudentOfClass(course.tenlop)" :key="index">
-              {{ index + 1 }} {{ student.name }}
+            <li v-for="(course, index) in courses" :key="course._id">
+            <li v-for="(student, studentIndex) in course.students" :key="studentIndex">
+              {{ studentIndex+1 }}.  {{ student.name }}
+            </li>
             </li>
           </ul>
           <button class="btn btn-danger" @click="showDetail[index] = false">Đóng</button>
@@ -140,11 +142,11 @@ export default {
     },
   },
   mounted() {
-  // Gọi phương thức getAllStudentOfClass() cho từng lớp học trong danh sách courses
-  this.courses.forEach(course => {
-    this.getAllStudentOfClass(course.tenlop);
-  });
-}
+    // Gọi phương thức getAllStudentOfClass() cho từng lớp học trong danh sách courses
+    this.courses.forEach(course => {
+      this.getAllStudentOfClass(course.tenlop);
+    });
+  }
 };
 </script>
 
@@ -181,8 +183,6 @@ ul {
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  /* Đảm bảo giá trị z-index cao hơn so với các phần tử khác */
   background-color: rgba(0, 0, 0, 0.5);
-  /* Background mờ để làm nổi bật phần tử này */
 }
 </style>

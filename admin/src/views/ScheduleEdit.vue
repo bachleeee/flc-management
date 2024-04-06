@@ -20,7 +20,9 @@
 <script>
 import ScheduleForm from "@/components/ScheduleForm.vue";
 import ScheduleService from "@/services/schedule.service";
-
+import AnounceService from "@/services/announce.service";
+import { useAuthStore } from "@/store/auth";
+import Cookies from 'js-cookie';
 export default {
   components: {
     ScheduleForm,
@@ -32,6 +34,12 @@ export default {
       isRoleFieldDisabled: true,
       isAddForm: false,
     };
+  },
+  computed: {
+    authStore() {
+      return useAuthStore();
+    },
+
   },
   methods: {
     async getSchedule() {
@@ -52,14 +60,26 @@ export default {
     async updateSchedule(updatedSchedule) {
       try {
         await ScheduleService.update(this.schedule._id, updatedSchedule);
-        // Cập nhật dữ liệu schedule sau khi cập nhật thành công
+
+        const token = Cookies.get('token');
+
+        const receiveList = this.schedule.students.concat(this.schedule.teachers);
+
+        const data = {
+          noiDung: "Lịch học của lớp " + this.schedule.tenlop + " đã được cập nhật",
+          toUsers: receiveList,
+        };
+
+        await AnounceService.create(token, data);
+
         this.schedule = updatedSchedule;
-        console.log(this.schedule)
+        console.log(this.schedule);
         window.alert("Lịch học được cập nhật thành công.");
       } catch (error) {
         console.log(error);
       }
     }
+
     ,
     async deleteSchedule() {
       // if (confirm("Bạn muốn xóa Lịch học này?")) {

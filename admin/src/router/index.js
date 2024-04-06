@@ -18,6 +18,7 @@ import ExamEdit from '@/views/ExamEdit.vue';
 import Order from '@/views/Order.vue';
 import OrderEdit from '@/views/OrderEdit.vue';
 import Login from '@/views/Login.vue';
+import Message from '@/views/Message.vue';
 import Product from '@/views/Product.vue';
 const routes = [
     {
@@ -162,6 +163,11 @@ const routes = [
         path: "/",
         name: "login",
         component: Login,
+    },
+    {
+        path: "/message",
+        name: "message",
+        component: Message,
     },
     {
         path: "/products/:id",

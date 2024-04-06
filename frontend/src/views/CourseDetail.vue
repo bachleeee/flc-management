@@ -1,18 +1,18 @@
 <template>
-  <div class="container">
+  <div class="container mt-4">
     <div v-if="course">
       <div class="row">
         <div class="col-9">
-          <div class="course-title">
+          <div class="course-title" style="color: blue; font-size: 25px; font-weight: 600;">
             {{ course.name }}
           </div>
           <hr>
           <div class="description">
-            {{ course.description }}
+            {{ course.des }}
           </div>
           <hr>
           <div class="signup" v-if="classes.length > 0">
-            <div>Lịch khai giảng</div>
+            <div style="color: blue; font-size: 25px; font-weight: 600;">Lịch khai giảng</div>
             <hr>
             <table class="table table-striped">
               <thead>
@@ -138,17 +138,17 @@ export default {
     },
     isUserAlreadyRegistered() {
       if (this.classes && this.classes.length > 0) {
-    for (const myClass of this.classes) {
-      if (myClass.students && myClass.students.length > 0) {
-        for (const student of myClass.students) {
-          if (student.tenhocvien === this.authStore.user.name) {
-            return true; // Người dùng đã đăng ký
+        for (const myClass of this.classes) {
+          if (myClass.students && myClass.students.length > 0) {
+            for (const student of myClass.students) {
+              if (student.tenhocvien === this.authStore.user.name) {
+                return true; // Người dùng đã đăng ký
+              }
+            }
           }
         }
       }
-    }
-  }
-  return false; 
+      return false;
     },
     formattedDays(days) {
       if (Array.isArray(days) && days.length > 0) {

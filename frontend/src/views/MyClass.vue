@@ -70,7 +70,6 @@ import ClassService from "@/service/class.service";
 import LessonService from "@/service/lesson.service";
 import ProgressService from "@/service/progress.service";
 import { useAuthStore } from '@/store/auth';
-import Cookies from 'js-cookie';
 
 export default {
   data() {
@@ -92,18 +91,17 @@ export default {
   methods: {
     async getMyClass() {
       try {
-        const className = this.$route.params.className; // Sử dụng this.$route.params.className để lấy giá trị của tham số className từ router
+        const className = this.$route.params.className;
         console.log(className);
         this.myClass = await ClassService.getClass(className);
 
         if (this.myClass) {
-
           const courseName = this.myClass.courseName;
           this.lesson = await LessonService.getLessonByClassName(this.myClass.tenlop);
           console.log("Danh sách bài học:", this.lesson);
 
-          const cookieValue = Cookies.get('token');
-          this.myProgress = await ProgressService.getMyProgress(cookieValue, this.myClass._id);
+          const token = localStorage.getItem('token');
+          this.myProgress = await ProgressService.getMyProgress(token, this.myClass._id);
           console.log("Tiến độ học tập của bạn:", this.myProgress);
         } else {
           console.log("Không tìm thấy lớp học phù hợp.");
@@ -130,7 +128,7 @@ export default {
     },
     async createProgress(lessonId) {
       try {
-        const cookieValue = Cookies.get('token');
+        const token = localStorage.getItem('token');
         const data = {
           classid: this.myClass._id,
           lessonid: lessonId,
@@ -138,12 +136,12 @@ export default {
         };
 
         if (this.authStore.isLoggedIn && this.myClass) {
-          const existingProgress = await ProgressService.getMyProgress(cookieValue, this.myClass._id);
+          const existingProgress = await ProgressService.getMyProgress(token, this.myClass._id);
           
           const hasExistingProgress = existingProgress.some(progress => progress.lessonid === lessonId);
 
           if (!hasExistingProgress) {
-            await ProgressService.createProgress(cookieValue, data);
+            await ProgressService.createProgress(token, data);
             console.log("Tiến độ đã được tạo cho bài học có ID:", lessonId);
           } else {
             console.log("Tiến trình đã tồn tại cho bài học có ID:", lessonId);
@@ -157,10 +155,11 @@ export default {
     },
   },
   created() {
-  this.getMyClass();
+    this.getMyClass();
   },
 };
 </script>
+
 
 <style scoped>
 a {

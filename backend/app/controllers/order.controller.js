@@ -1,14 +1,18 @@
 const ApiError = require("../api-error");
 const orderService = require("../services/order.service");
+const userService = require("../services/user.service");
 
 exports.createOrder = async (req, res, next) => {
   const {id} = req.user;
   try {
-    const userid = id;
+    const user = await userService.findById(id)
+
     const _data = {
       ...req.body,
-      userid,
+      userId: id,
+      userName: user.name,
       createdAt: new Date(),
+      orderStatus: "waiting",
     };
 
     const result = await orderService.createOrder(_data);
@@ -19,15 +23,26 @@ exports.createOrder = async (req, res, next) => {
 };
 
 exports.findAll = async (req, res, next) => {
-  let documents = [];
   try {
-      documents = await orderService.findAll();
-  
+    let documents = await orderService.findAll();
+    
+    // Sắp xếp mảng theo trường orderby
+    documents.sort((a, b) => {
+      if (a.createdAt < b.createdAt) {
+        return -1;
+      }
+      if (a.createdAt > b.createdAt) {
+        return 1;
+      }
+      return 0;
+    });
+    
+    return res.send(documents);
   } catch (error) {
     next(new ApiError("An error occurred while retrieving orders", 500));
   }
-  return res.send(documents);
 };
+
 
 exports.findOneBySlug = async (req, res, next) => {
   const { slug } = req.params;

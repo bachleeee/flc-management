@@ -47,7 +47,6 @@ import LessonService from "@/service/lesson.service";
 import ProgressService from "@/service/progress.service";
 import { useAuthStore } from "@/store/auth";
 import Exam from "@/components/Exam.vue";
-import Cookies from 'js-cookie';
 
 export default {
   components: {
@@ -88,9 +87,9 @@ export default {
   },
   async getProgress() {
     try {
-      const cookieValue = Cookies.get('token');
+      const token = localStorage.getItem('token');
       const classid = null;
-      const responseProgress = await ProgressService.getMyProgress(cookieValue,classid, this.lesson._id);
+      const responseProgress = await ProgressService.getMyProgress(token,classid, this.lesson._id);
       if (responseProgress) {
         this.myProgress = responseProgress;
         console.log("Dữ liệu tiến độ:", this.myProgress);

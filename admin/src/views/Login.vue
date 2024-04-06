@@ -48,7 +48,7 @@ const password = ref('');
 const { loginAdmin, isLoggedIn } = useAuthStore();
 const onSubmit = async () => {
     await loginAdmin({ email: email.value, password: password.value });
-    router.push('/product');
+    router.push('/user');
 
 };
 

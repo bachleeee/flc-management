@@ -47,10 +47,7 @@ exports.loginUser = async (req, res, next) => {
   }
 
   res.json({
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    phone: user.phone,
+    user,
     token: generateToken(user?._id),
   });
 };
@@ -65,6 +62,21 @@ exports.loginAdmin = async (req, res, next) => {
   }
 
   if (user.password !== password || user.role !== 'admin') {
+    return next(new ApiError("Login fail", 401));
+  }
+
+  res.json(user);
+};
+exports.loginTeacher = async (req, res, next) => {
+  const { email, password } = req.body;
+
+  const user = await userService.findUser(email);
+
+  if (!user) {
+    return next(new ApiError("User not found", 401));
+  }
+
+  if (user.password !== password || user.role !== 'teacher') {
     return next(new ApiError("Login fail", 401));
   }
 
@@ -125,9 +137,9 @@ exports.addMyClass = async (req, res, next) => {
     return next(new ApiError("Update data cannot be empty", 400));
   }
 
-  const tenHocVien = req.body.tenHocVien;
+  const studentName = req.body.studentName;
   const hinhthuc = req.body.hinhthuc;
-  const studentData = await userService.findOneByName(tenHocVien);
+  const studentData = await userService.findOneByName(studentName);
 
   let ngayhethan;
 
@@ -243,6 +255,7 @@ exports.createOrder = async (req, res, next) => {
     let newRegister = {
       ...req.body,
       orderby: user.name,
+      userId: user._id,
       orderStatus: "waiting",
       createdAt: currentDate
     };

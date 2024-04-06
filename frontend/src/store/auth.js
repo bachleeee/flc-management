@@ -1,11 +1,8 @@
 import { defineStore } from 'pinia';
-import Cookies from 'js-cookie';
 import UserService from '@/service/user.service';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    isAuthenticated: false,
-    authUser: null,
     isLoggedIn: false,
     user: null
   }),
@@ -13,39 +10,50 @@ export const useAuthStore = defineStore('auth', {
     async login({ email, password }) {
       try {
         const response = await UserService.login({ email, password });
-        if (response) {
-          this.isAuthenticated = true;
-          console.log("đăng nhập thành công")
+        if (response && response.token) {
+          // Lưu thông tin người dùng vào Local Storage
+          localStorage.setItem('token', response.token);
+          localStorage.setItem('user', JSON.stringify(response.user));
 
           this.isLoggedIn = true;
-          const user = await UserService.get(response._id);
-          console.log(user)
-          Cookies.set('isLoggedIn', 'true', { expires: 7 });
-          Cookies.set('user', JSON.stringify(user), { expires: 7 });
+          this.user = response.user;
+          
+          console.log("Đăng nhập thành công");
         } else {
-          this.isAuthenticated = false;
+          this.isLoggedIn = false;
+          this.user = null;
           this.error = response ? response.message : 'Đăng nhập không thành công';
         }
       } catch (error) {
-        this.isAuthenticated = false;
+        console.error("Đăng nhập không thành công", error);
+        this.isLoggedIn = false;
         this.error = 'Đăng nhập không thành công';
       }
     },
     logout() {
-      this.isAuthenticated = false;
-      this.authUser = null;
-      this.error = '';
+      // Xóa token và thông tin người dùng từ Local Storage
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+
       this.isLoggedIn = false;
-      Cookies.remove('isLoggedIn');
-      Cookies.remove('user');
+      this.user = null;
+      this.error = '';
     },
     checkLoginStatus() {
-      const isLoggedIn = Cookies.get('isLoggedIn');
-      const userString = Cookies.get('user');
+      // Kiểm tra xem có token trong Local Storage không
+      const token = localStorage.getItem('token');
+      if (token) {
+        // Nếu có, đánh dấu là đã xác thực và đăng nhập thành công
+        this.isLoggedIn = true;
 
-      this.isLoggedIn = isLoggedIn === 'true';
+        // Lấy thông tin người dùng từ Local Storage
+        const userString = localStorage.getItem('user');
+        if (userString) {
+          this.user = JSON.parse(userString);
+        }
 
-      this.user = userString ? JSON.parse(userString) : null;
+        console.log("Đã xác thực");
+      }
     },
   },
 });

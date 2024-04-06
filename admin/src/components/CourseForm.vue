@@ -46,10 +46,10 @@
       </div>
 
       <div class="form-group">
-        <label for="description">Mô tả</label>
-        <Field name="description" type="text" class="form-control" v-model="courseLocal.description"
+        <label for="des">Mô tả</label>
+        <Field name="des" type="text" class="form-control" v-model="courseLocal.des"
           style="height: 150px; resize: vertical;" />
-        <ErrorMessage name="description" class="error-feedback" />
+        <ErrorMessage name="des" class="error-feedback" />
       </div>
 
 
@@ -92,7 +92,7 @@ export default {
       status: yup
         .string()
         .required("Vui lòng chọn tình trạng."),
-      description: yup
+      des: yup
         .string()
         .max(500, "Mô tả không vượt quá 500 ký tự."),
     });

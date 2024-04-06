@@ -38,7 +38,6 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref } from 'vue';
 import { useAuthStore } from '@/store/auth';
@@ -49,12 +48,9 @@ const password = ref('');
 const { login, isLoggedIn } = useAuthStore();
 const onSubmit = async () => {
   await login({ email: email.value, password: password.value });
-  router.push('/');
-
+  
 };
-
 </script>
-
 
 <style scoped>
 .login-page {

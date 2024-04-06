@@ -9,6 +9,7 @@ import CourseDetail from '@/views/CourseDetail.vue'
 import SignUpClass from '@/views/SignUpClass.vue'
 import MyClass from '@/views/MyClass.vue'
 import LessonDetail from '@/views/LessonDetail.vue'
+import Search from '@/views/Search.vue'
 
 const routes = [
     {
@@ -57,6 +58,11 @@ const routes = [
         path: "/luyen-tap/:lessonName",
         name: "LessonDetail",
         component: LessonDetail,
+    },
+    {
+        path: "/search-course/:searchKey",
+        name: "Search",
+        component: Search,
     },
 ];
 const router = createRouter({

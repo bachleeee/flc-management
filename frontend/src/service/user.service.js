@@ -49,7 +49,7 @@ class UserService {
         })).data;
     }
 
-    async crateOrder(token, data) {
+    async createOrder(token, data) {
         return (await this.api.post('/order', data, {
             headers: {
                 Authorization: `Bearer ${token}`,

@@ -9,7 +9,9 @@ const progressRouter = require("./app/routes/progress.routes");
 const commentRouter = require("./app/routes/comment.routes");
 const examRouter = require("./app/routes/exam.routes");
 const roomRouter = require("./app/routes/room.routes");
+const announceRouter = require("./app/routes/announce.routes");
 const scheduleRouter = require("./app/routes/schedule.routes");
+const messageRouter = require("./app/routes/message.routes");
 const orderRouter = require("./app/routes/order.routes");
 
 require('dotenv').config();
@@ -32,6 +34,8 @@ app.use("/api/class", classRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/schedule", scheduleRouter);
 app.use("/api/room", roomRouter);
+app.use("/api/announce", announceRouter);
+app.use("/api/message", messageRouter);
 app.use("/api/comment", commentRouter);
 app.use("/api/exam", examRouter);
 

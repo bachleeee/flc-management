@@ -73,6 +73,9 @@ class DatabaseServices {
   get room() {
     return this.db.collection("room");
   }
+  get announce() {
+    return this.db.collection("announce");
+  }
   get reply() {
     return this.db.collection("reply");
   }
@@ -84,6 +87,12 @@ class DatabaseServices {
   }
   get history() {
     return this.db.collection("history");
+  }
+  get group() {
+    return this.db.collection("group");
+  }
+  get message() {
+    return this.db.collection("message");
   }
 }
 const databaseSetvices = new DatabaseServices();

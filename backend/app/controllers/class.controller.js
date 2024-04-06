@@ -208,11 +208,12 @@ exports.deleteAllClass = async (req, res, next) => {
 };
 
 exports.addToClass = async (req, res, next) => {
-  const classid = req.body.classid
-  const tenHocVien = req.body.tenHocVien
+  const classId = req.body.classId
+  const studentName = req.body.studentName
+  const studentId = req.body.studentId
   try {
-
-    result = await classService.addToClass(classid,tenHocVien)
+    
+    result = await classService.addToClass(classId,studentName,studentId)
     return res.send(result);
   } catch (error) {
     next(new ApiError("Lỗi khi thêm lớp học", 500));
@@ -262,6 +263,8 @@ exports.createClassSchedule = async (req, res, next) => {
           gioBatDau,
           gioKetThuc,
           stt: sessionsCount + 1,
+          students: myClass.students,
+          teachers: myClass.teachers
         };
 
         schedules.push(classSchedule);

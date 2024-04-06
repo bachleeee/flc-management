@@ -19,6 +19,7 @@ const {
   getAllOrder,
   reduceProductQuantity,
   loginAdmin,
+  loginTeacher,
   addTeacher,
   createDegree,
   createExp,
@@ -47,6 +48,7 @@ router.route('/register').post(createUser)
 router.route('/login').post(loginUser)
 
 router.route('/login-admin').post(loginAdmin)
+router.route('/login-teacher').post(loginTeacher)
 
 router.route('/:id([0-9a-fA-F]{24})').get(findOne).put(update).delete(deleteUser);
 router.route('/logout').post(authenticateToken, logoutUser);

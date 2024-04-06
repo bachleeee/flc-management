@@ -10,7 +10,7 @@
     </td>
     <td class="col-2">
       <button :disabled="isDisabled(order.orderby, order.className, order.orderStatus)"
-        class="btn btn-sm btn-warning mr-4" @click="addtoclass(order.orderby, order.className, order.createdAt)">
+        class="btn btn-sm btn-warning mr-4" @click="addtoclass(order.orderby, order.userId, order.className, order.createdAt)">
         Thêm HV
       </button>
       <button class="btn btn-sm btn-danger mr-4" @click="deleteOrder(index, order._id)">
@@ -70,22 +70,23 @@ export default {
         params: { id: orderId },
       });
     },
-    async addtoclass(tenHocVien, className, ngayDangKy) {
+    async addtoclass(studentName, studentId,  className, ngayDangKy) {
 
       const responseClass = await ClassService.getClass(className);
       const hinhThuc = responseClass.hinhthuc
       try {
         const addToClassData = {
-          tenHocVien,
-          classid: responseClass._id,
+          studentName, 
+          studentId,
+          classId: responseClass._id,
         };
         const addToStudentData = {
           className,
           ngayDangKy,
           ngayketthuc: responseClass.ngayketthuc,
           hinhThuc,
-          tenHocVien
-        };
+          studentName
+       };
         const updateSiso = {
           siso: responseClass.siso + 1
         };

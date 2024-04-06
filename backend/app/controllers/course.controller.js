@@ -71,6 +71,7 @@ exports.update = async (req, res, next) => {
     status: req.body.status,
     img: req.body.img,
     category: req.body.category,
+    des: req.body.des,
   };
   try {
     const document = await productService.update(id, _data);

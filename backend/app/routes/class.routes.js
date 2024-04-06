@@ -31,6 +31,5 @@ router.route("/:name").get(findOneByName);
 
 router.route("/course/:id([0-9a-fA-F]{24})").get(getClassByCourse)
 
-
 router.route("/addtoclass").post(addToClass)
 module.exports = router;

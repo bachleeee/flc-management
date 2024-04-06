@@ -250,49 +250,38 @@ class GroupService {
     }
   }
   
-  async addToClass(classId, tenHocVien) {
-    const filter = {
-      _id: new ObjectId(classId),
-    };
-  
-    const update = {
-      $addToSet: {
-        students: tenHocVien,
-      },
-    };
-  
-    const options = {
-      returnDocument: 'after',
-    };
-  
-    try {
-      let updatedClass = await this.databaseSetvices.class.findOne(filter);
-  
-      if (!updatedClass) {
-        throw new Error('Class not found');
-      }
-  
-      if (!updatedClass.students) {
-        // Nếu mảng students không tồn tại, tạo một mảng mới chứa học viên mới
-        updatedClass.students = [tenHocVien];
-      } else {
-        // Nếu mảng students đã tồn tại, thêm học viên mới vào mảng đó
-        updatedClass.students.push(tenHocVien);
-      }
-  
-      updatedClass = await this.databaseSetvices.class.findOneAndUpdate(
-        filter,
-        {
-          $set: updatedClass,
-        },
-        options
-      );
-  
-      return updatedClass;
-    } catch (error) {
-      throw new Error(error);
+  async addToClass(classId, studentName, studentId) {
+  const filter = {
+    _id: new ObjectId(classId),
+  };
+
+  const update = {
+    $addToSet: {
+      students: { name: studentName, id: studentId }
+    },
+  };
+
+  const options = {
+    returnDocument: 'after',
+  };
+
+  try {
+    let updatedClass = await this.databaseSetvices.class.findOneAndUpdate(
+      filter,
+      update,
+      options
+    );
+
+    if (!updatedClass) {
+      throw new Error('Class not found');
     }
+
+    return updatedClass;
+  } catch (error) {
+    throw new Error(error);
   }
+}
+
   
 }
 const databaseSetvices = require("../utils/mongodb.util");

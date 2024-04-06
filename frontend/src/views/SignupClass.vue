@@ -83,7 +83,8 @@
                             </div>
                             <div class="thong-tin-khoa-hoc">
                                 <label class="nhan" for="">Học phí:</label>
-                                <label v-if="total !== null" class="ten-dang-ky" for="" style="color">{{formatCurrency(this.total)}}</label>
+                                <label v-if="total !== null" class="ten-dang-ky" for=""
+                                    style="color">{{ formatCurrency(this.total) }}</label>
                             </div>
                         </div>
                     </div>
@@ -141,8 +142,9 @@ import { useAuthStore } from '@/store/auth';
 import ClassService from '@/service/class.service';
 import CourseService from '@/service/course.service';
 import UserService from '@/service/user.service';
+import AnounceService from "@/service/announce.service";
+
 import { useAuthStore } from '@/store/auth';
-import Cookies from 'js-cookie';
 export default {
     data() {
         return {
@@ -243,8 +245,7 @@ export default {
         },
         async createOrder() {
             try {
-                const cookieValue = Cookies.get('token');
-
+                const token = localStorage.getItem('token');
                 const data = {
                     total: this.total,
                     className: this.myClass.tenlop,
@@ -253,18 +254,27 @@ export default {
                 }
 
                 if (this.authStore.isLoggedIn) {
-                    const result = await UserService.crateOrder(cookieValue, data);
-                    this.showAddToCartMessage = true;
-                    console.log(result);
-                }
+                    const result = await UserService.createOrder(token, data);
+                    if (result) {
+                        console.log("Đăng ký lớp thành công:", result);
 
-                if (this.showAddToCartMessage) {
-                    window.alert("Thanh toán thành công");
+                        const dataAnnounce = {
+                            noiDung: `${this.authStore.user.name} đã đăng ký lớp ${this.myClass.tenlop}`,
+                            toUsers: [{ id: "65940aa9f25be141f8c3f83f" }] 
+                        };
+                        window.alert("Đăng ký thành công!");
+                        await AnounceService.create(token, dataAnnounce);
+                    } else {
+                        console.error("Lỗi khi đăng ký lớp.");
+                    }
+                } else {
+                    console.error("Người dùng chưa đăng nhập.");
                 }
             } catch (error) {
-                console.log(error)
+                console.error("Lỗi khi tạo đơn hàng:", error);
             }
-        },
+        }
+
     },
     created() {
         this.loadDetails();
