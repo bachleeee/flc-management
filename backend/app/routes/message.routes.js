@@ -1,4 +1,5 @@
 const { authenticateToken } = require('../middlewares/verifyToke');
+const { upload } = require('../middlewares/verifyToke');
 const express = require("express");
 const {
   findAll,
@@ -9,13 +10,17 @@ const {
   deleteAllMessages,
   findOneBySlug,
   createGroup,
-  getMyGroups
+  getMyGroups,
+  createMessageImg,
+  createMessageFile
 } = require("../controllers/message.controller");
 
 const router = express.Router();
 
 router.route("/:groupid([0-9a-fA-F]{24})").get(findAll).delete(deleteAllMessages)
 router.route("/").post(authenticateToken,createMessage)
+router.route("/img/sendImg").post(createMessageImg)
+router.route("/file/sendFile").post(createMessageFile)
 router.route("/:id([0-9a-fA-F]{24})").get(findOne).put(authenticateToken,update).delete(deleteMessage);
 
 router.route("/group").post(createGroup).get(authenticateToken,getMyGroups)

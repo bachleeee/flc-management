@@ -11,6 +11,13 @@ class messageService {
             },
         })).data;
     }
+    async createMessImg(formData) {
+        return await this.api.post('/img/sendImgaa', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+    }
     async getAllMessage(groupid) {
         return (await this.api.get(`/${groupid}`)).data;
     }

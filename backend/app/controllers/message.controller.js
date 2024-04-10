@@ -2,27 +2,123 @@ const ApiError = require("../api-error");
 const messageService = require("../services/message.service");
 const userService = require("../services/user.service");
 
+const multer = require('multer');
+function getCurrentDateTimeString() {
+  const now = new Date();
+  const day = now.getDate().toString().padStart(2, '0');
+  const month = (now.getMonth() + 1).toString().padStart(2, '0');
+  const year = now.getFullYear().toString();
+  const hour = now.getHours().toString().padStart(2, '0');
+  const minute = now.getMinutes().toString().padStart(2, '0');
+
+  return `${day}-${month}-${year}-${hour}-${minute}`;
+}
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    const dateTimeString = getCurrentDateTimeString(); // Lấy chuỗi thời gian hiện tại
+    const originalname = file.originalname; 
+    cb(null, dateTimeString + '-' + originalname); // Sử dụng chuỗi thời gian hiện tại trong tên file
+  }
+});
+
+const upload = multer({ storage: storage });
+
 exports.createMessage = async (req, res, next) => {
-  const {id} = req.user;
+  const { id } = req.user;
   try {
     const user = await userService.findById(id);
 
     const userid = id;
-    const _data = {
-      ...req.body,
-      loai: req.body.loai,
-      userid,
-      name: user.name,
-      groupid: req.body.groupid,
-      createdAt: new Date(),
-    };
-
-    const result = await messageService.createMessage(_data);
+    let _data;
+    if (req.body.loai === 'van_ban') {
+      _data = {
+        loai: req.body.loai,
+        userid,
+        name: user.name,
+        text: req.body.text,
+        groupid: req.body.groupid,
+        createdAt: new Date(),
+      };
+    } else  if (req.body.loai === 'hinh_anh')  {
+      _data = {
+        loai: req.body.loai,
+        userid,
+        name: user.name,
+        fileName: Date.now() + '-' + req.body.fileName,
+        groupid: req.body.groupid,
+        createdAt: new Date(),
+      };
+    
+    } else  if (req.body.loai === 'tep')  {
+      _data = {
+        loai: req.body.loai,
+        userid,
+        name: user.name,
+        fileName: Date.now() + '-' + req.body.fileName,
+        groupid: req.body.groupid,
+        createdAt: new Date(),
+      };
+    }
+   const result = await messageService.createMessage(_data);
     return res.send(result);
   } catch (error) {
     next(new ApiError("Lỗi tạo tin nhắn", 500));
   }
 };
+
+exports.createMessageImg = [
+  upload.single('image'),
+
+  async (req, res, next) => {
+    try {
+      const user = await userService.findById(req.body.userid);
+
+      const dateTimeString = getCurrentDateTimeString();
+      const _data = {
+        loai: req.body.loai,
+        userid: req.body.userid,
+        name: user.name,
+        fileName: dateTimeString  + '-' + req.body.fileName, // Sử dụng currentTime ở đây
+        groupid: req.body.groupid,
+        createdAt: new Date(),
+      };
+    
+   const result = await messageService.createMessage(_data);
+      return res.send(result);
+    } catch (error) {
+      next(new ApiError("Lỗi tạo tin nhắn hình ảnh", 500));
+    }
+  }
+];
+exports.createMessageFile = [
+  upload.single('file'),
+
+  async (req, res, next) => {
+    try {
+      const user = await userService.findById(req.body.userid);
+
+      const dateTimeString = getCurrentDateTimeString();
+      const _data = {
+        loai: req.body.loai,
+        userid: req.body.userid,
+        name: user.name,
+        fileName: dateTimeString  + '-' + req.body.fileName, // Sử dụng currentTime ở đây
+        groupid: req.body.groupid,
+        createdAt: new Date(),
+      };
+    
+   const result = await messageService.createMessage(_data);
+      return res.send(result);
+    } catch (error) {
+      next(new ApiError("Lỗi tạo tin nhắn hình ảnh", 500));
+    }
+  }
+];
+
 exports.createGroup = async (req, res, next) => {
   try {
     const _data = {
@@ -48,7 +144,7 @@ exports.getMyGroups = async (req, res, next) => {
 
 exports.findAll = async (req, res, next) => {
   let documents = [];
-  const {groupid} = req.params
+  const { groupid } = req.params
   try {
     documents = await messageService.findAll(groupid);
   } catch (error) {

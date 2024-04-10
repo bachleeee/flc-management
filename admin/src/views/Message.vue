@@ -3,14 +3,21 @@
         <div class="p-4">
             <div class="rounded" style="height: 610px; display: flex;">
                 <div class="col-3 groups-mess">
-                    <div v-for="(group, index) in myGroups" :key="index" class="mb-3" @click="setActiveGroup(index)">
-                        <div>{{ group.groupName }}</div>
-                        <div>{{ group.members.length }} thành viên</div>
-                        <hr>
+                    <div v-for="(group, index) in myGroups" :key="index" @click="setActiveGroup(index)" :class="{ 'group-item': true, 'selected': activeGroupIndex === index }">
+                        <div class="d-flex p-2">
+                            <div class="btn-group mr-3">
+                                <i class="fa-solid fa-user-group"></i>
+                            </div>
+                            <div>
+                                <div>{{ group.groupName }}</div>
+                                <div> {{ group.members.length}}thành viên</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-9 mess-detail">
-                    <MessageDetail v-if="activeGroupIndex !== null" :group="myGroups[activeGroupIndex]" :token="token"></MessageDetail>
+                    <MessageDetail v-if="activeGroupIndex !== null" :group="myGroups[activeGroupIndex]" :token="token">
+                    </MessageDetail>
                 </div>
             </div>
         </div>
@@ -19,7 +26,7 @@
 
 <script>
 import MessageService from "@/services/message.service";
-import MessageDetail from "@/components/MessageDetail.vue"; 
+import MessageDetail from "@/components/MessageDetail.vue";
 
 export default {
     components: {
@@ -71,10 +78,35 @@ export default {
 }
 
 .groups-mess {
-    background-color: rgb(169, 190, 244);
+    background-color: #b1cdfecc
 }
 
 .mess-detail {
     background-color: white;
+}
+
+.fa-user-group {
+  color: white;
+  padding-top: 5px;
+  font-size: 25px;
+}
+
+.btn-group {
+  background-color: #0ac1f4;
+  transition: all 0.4s ease;
+  height: 60px;
+  width: 60px;
+  display: block;
+  text-align: center;
+  border-radius: 50%;
+  padding: 10px;
+}
+
+.group-item:hover {
+    background-color: #f4f8ffcc;
+    cursor: pointer;
+}
+.selected {
+    background-color: #f4f8ffcc;
 }
 </style>

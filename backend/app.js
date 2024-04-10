@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const ApiError = require("./app/api-error");
+const multer = require('multer');
 const usersRouter = require("./app/routes/users.routes");
 const courseRouter = require("./app/routes/course.routes");
 const classRouter = require("./app/routes/class.routes");
@@ -38,7 +39,7 @@ app.use("/api/announce", announceRouter);
 app.use("/api/message", messageRouter);
 app.use("/api/comment", commentRouter);
 app.use("/api/exam", examRouter);
-
+app.use('/uploads', express.static('D:/ProjectWeb/backend/uploads'));
 // handle 404 response
 app.use((req, res, next) => {
   return next(new ApiError("Resource not found", 404));

@@ -1,28 +1,54 @@
 <template>
     <div class="row" style="position: relative;">
         <div class="col-9" style="padding: 0;">
-            <div style="background-color: aliceblue;" class="p-2">
+            <div style="background-color: #4585f5cc;" class="p-2">
                 <div>{{ group.groupName }}</div>
                 <div style="font-size: 12px;">{{ group.members.length }} thành viên</div>
             </div>
             <div style="background-color: white;">
                 <ul class="message-list">
                     <li v-for="(message, index) in messages" :key="index" class="m-2">
-                        <div :class="myMessage(message.userid)">
-                            <div class="message-name">{{ message.name }}</div>
-                            <div class="message-text">{{ message.text }}</div>
-                            <div class="message-time">{{ formatTime(message.createdAt) }}</div>
+                        <div v-if="message.loai === 'van_ban'">
+                            <div :class="myMessage(message.userid)">
+                                <div class="message-name">{{ message.name }}</div>
+                                <div class="message-text">{{ message.text }}</div>
+                                <div class="message-time">{{ formatTime(message.createdAt) }}</div>
+                            </div>
                         </div>
-
+                        <div v-else-if="message.loai === 'hinh_anh'">
+                            <div :class="myMessage(message.userid)">
+                                <div class="message-name">{{ message.name }}</div>
+                                <div class="image-wrapper">
+                                    <img :src="'http://localhost:5000/uploads/' + message.fileName" alt=""
+                                        class="fit-image">
+                                </div>
+                                <div class="message-time">{{ formatTime(message.createdAt) }}</div>
+                            </div>
+                        </div>
+                        <div v-else>
+                            <div :class="myMessage(message.userid)">
+                                <div class="message-name">{{ message.name }}</div>
+                                <div class="image-wrapper">
+                                <embed :src="'http://localhost:5000/uploads/' + message.fileName" />{{ message.fileName }}</div>
+                                <div class="message-time">{{ formatTime(message.createdAt) }}</div>
+                            </div>
+                        </div>
                     </li>
-                </ul>
+                </ul>  
                 <div class="textarea-wrapper d-flex">
                     <textarea v-model="newMessage" rows="1" placeholder="Nhập tin nhắn" class="form-control"></textarea>
+                  <form @submit.prevent="photoSubmit">
+                        <input type="file" name="image" accept="image/*" />
+                        <input type="submit" value="Upload Photo" />
+                    </form>
+                    <form @submit.prevent="fileSubmit">
+                        <input type="file" name="file" accept="application/msword, application/pdf" />
+                        <input type="submit" value="Upload File" />
+                    </form>
                     <button @click="sendMessage" class="btn btn-primary">Gửi</button>
                 </div>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -30,6 +56,7 @@
 import MessageService from "@/services/message.service";
 import moment from 'moment';
 import { useAuthStore } from '@/store/auth';
+import axios from 'axios';
 
 export default {
     props: {
@@ -50,7 +77,8 @@ export default {
     data() {
         return {
             messages: [],
-            newMessage: ''
+            newMessage: '',
+            lastMessage: null
         }
     },
     methods: {
@@ -63,7 +91,6 @@ export default {
                 const response = await MessageService.getAllMessage(this.group._id);
                 if (response) {
                     this.messages = response;
-                    console.log(this.messages)
                 }
             } catch (error) {
                 console.error('Error while fetching groups:', error);
@@ -77,13 +104,104 @@ export default {
                 const dataMess = {
                     groupid: this.group._id,
                     text: this.newMessage,
-                    loai: "van ban"
+                    loai: "van_ban"
                 }
                 await MessageService.create(this.token, dataMess);
                 this.newMessage = '';
                 this.getGroupMessage();
             } catch (error) {
                 console.error('Error while sending message:', error);
+            }
+        },
+        async photoSubmit(event) {
+            try {
+                event.preventDefault();
+
+                const file = event.target.elements.image.files[0];
+                if (!file) {
+                    console.error('No file selected');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('image', file);
+
+                const fileName = file.name;
+                formData.append('groupid', this.group._id);
+                formData.append('loai', "hinh_anh");
+                formData.append('fileName', fileName);
+                formData.append('userid', this.authStore.user._id);
+
+                const uploadResponse = await axios.post('http://localhost:5000/api/message/img/sendImg', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+
+                console.log('Image uploaded successfully!', uploadResponse);
+            } catch (error) {
+                console.error('Error while submitting file:', error);
+            }
+        },
+        async fileSubmit(event) {
+            try {
+                event.preventDefault();
+
+                const file = event.target.elements.file.files[0];
+                if (!file) {
+                    console.error('No file selected');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const fileName = file.name;
+                formData.append('groupid', this.group._id);
+                formData.append('loai', "tep");
+                formData.append('fileName', fileName);
+                formData.append('userid', this.authStore.user._id);
+
+                const uploadResponse = await axios.post('http://localhost:5000/api/message/file/sendFile', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+
+                console.log('Image uploaded successfully!', uploadResponse);
+            } catch (error) {
+                console.error('Error while submitting file:', error);
+            }
+        },
+
+
+
+        openFileInput() {
+            this.$refs.fileInput.click();
+        },
+        async handleFileChange(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = async () => {
+                // Không cần imageDataUrl ở đây
+                await this.sendImg(file);
+            };
+
+            reader.readAsDataURL(file);
+        },
+
+        async sendImg(file) {
+            try {
+                const dataMess = {
+                    groupid: this.group._id,
+                    originalname: file.name,
+                    loai: "hinh_anh"
+                };
+                // const response = await MessageService.createMessImg(this.token, dataMess);
+                console.log(dataMess);
+            } catch (error) {
+                console.error('Error while sending image:', error);
             }
         },
         setActiveGroup(index) {
@@ -118,12 +236,13 @@ export default {
 };
 </script>
 
+
 <style scoped>
 .message-item {
     background-color: antiquewhite;
     width: auto;
     min-width: 100px;
-    max-width: 150px;
+    max-width: 260px;
     margin-bottom: 10px;
     padding: 10px;
     border-radius: 10px;
@@ -133,25 +252,26 @@ export default {
     background-color: rgb(164, 219, 248);
     width: auto;
     min-width: 100px;
-    max-width: 160px;
+    max-width: 260px;
     margin-bottom: 10px;
     padding: 10px;
     right: 0;
-    margin-left: 180px;
+    margin-left: 400px;
     border-radius: 10px;
 }
 
 .message-list {
     padding: 0;
     list-style-type: none;
-    max-height: 330px;
+    max-height: 470px;
     overflow-y: auto;
+    background-color: #f4f8ffcc;
 }
 
 .textarea-wrapper {
     position: absolute;
     width: 100%;
-    top: 390px;
+    top: 540px;
     padding: 10px;
 }
 
@@ -165,5 +285,17 @@ export default {
 
 .message-text {
     font-size: 15px
+}
+
+.image-wrapper {
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+}
+
+.fit-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 </style>

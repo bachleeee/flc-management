@@ -28,6 +28,20 @@ class MessageService {
     );
     return result;
   }
+  async createMessageImg(data) {
+    const message = this.extractMessageData(data);
+    const result = await this.databaseServices.message.findOneAndUpdate(
+      message,
+      {
+        $setOnInsert: { isSeen: []},
+      },
+      {
+        upsert: true,
+        returnDocument: "after",
+      }
+    );
+    return result;
+  }
   async createGroup(data) {
     const message = this.extractMessageData(data);
     const result = await this.databaseServices.group.findOneAndUpdate(
