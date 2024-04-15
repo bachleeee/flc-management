@@ -7,17 +7,23 @@
             </div>
             <div style="background-color: white;">
                 <ul class="message-list">
-                    <li v-for="(message, index) in messages" :key="index" class="m-2">
+                    <li v-for="(message, index) in messages" :key="index" class="message m-2">
                         <div v-if="message.loai === 'van_ban'">
                             <div :class="myMessage(message.userid)">
-                                <div class="message-name">{{ message.name }}</div>
+                                <div class="d-flex justify-content-between">
+                                    <span style="font-size: 12px;">{{ message.name }}</span>
+                                    <i class="fa-solid fa-ellipsis" @click="showOptions(index)"></i>
+                                </div>
                                 <div class="message-text">{{ message.text }}</div>
                                 <div class="message-time">{{ formatTime(message.createdAt) }}</div>
                             </div>
                         </div>
                         <div v-else-if="message.loai === 'hinh_anh'">
                             <div :class="myMessage(message.userid)">
-                                <div class="message-name">{{ message.name }}</div>
+                                <div class="d-flex justify-content-between">
+                                    <span style="font-size: 12px;">{{ message.name }}</span>
+                                    <i class="fa-solid fa-ellipsis" @click="showOptions(index)"></i>
+                                </div>
                                 <div class="image-wrapper">
                                     <img :src="'http://localhost:5000/uploads/' + message.fileName" alt=""
                                         class="fit-image">
@@ -27,24 +33,41 @@
                         </div>
                         <div v-else>
                             <div :class="myMessage(message.userid)">
-                                <div class="message-name">{{ message.name }}</div>
+                                <div class="d-flex justify-content-between">
+                                    <span style="font-size: 12px;">{{ message.name }}</span>
+                                    <i class="fa-solid fa-ellipsis" @click="showOptions(index)"></i>
+                                </div>
                                 <div class="image-wrapper">
-                                <embed :src="'http://localhost:5000/uploads/' + message.fileName" />{{ message.fileName }}</div>
+                                    <embed :src="'http://localhost:5000/uploads/' + message.fileName" />{{
+                                        message.fileName }}
+                                </div>
                                 <div class="message-time">{{ formatTime(message.createdAt) }}</div>
                             </div>
                         </div>
+                        <div v-if="showDropdown[index]" class="dropdown-container">
+                            <div class="d-flex" style="flex-direction: column; background-color: white;;">
+                                <button class="btn btn-secondary my-1" @click="">Chỉnh sửa</button>
+                                <button class="btn btn-secondary my-1" @click="">Xóa</button>
+                            </div>
+                        </div>
                     </li>
-                </ul>  
+                </ul>
                 <div class="textarea-wrapper d-flex">
                     <textarea v-model="newMessage" rows="1" placeholder="Nhập tin nhắn" class="form-control"></textarea>
-                  <form @submit.prevent="photoSubmit">
+                    <!-- <form @submit.prevent="photoSubmit">
                         <input type="file" name="image" accept="image/*" />
                         <input type="submit" value="Upload Photo" />
                     </form>
                     <form @submit.prevent="fileSubmit">
                         <input type="file" name="file" accept="application/msword, application/pdf" />
                         <input type="submit" value="Upload File" />
-                    </form>
+                    </form> -->
+                    <input type="file" name="image" ref="photoInput" accept="image/*" style="display: none"
+                        @change="handlePhotoChange">
+                    <i class="fa-solid fa-image" @click="openPhotoInput"></i>
+                    <input type="file" name="file" ref="fileInput" accept="application/msword, application/pdf"
+                        style="display: none" @change="handleFileChange">
+                    <i class="fa-solid fa-file" @click="openFileInput"></i>
                     <button @click="sendMessage" class="btn btn-primary">Gửi</button>
                 </div>
             </div>
@@ -76,6 +99,7 @@ export default {
     },
     data() {
         return {
+            showDropdown: [],
             messages: [],
             newMessage: '',
             lastMessage: null
@@ -113,11 +137,9 @@ export default {
                 console.error('Error while sending message:', error);
             }
         },
-        async photoSubmit(event) {
+        async photoSubmit(file) {
             try {
-                event.preventDefault();
 
-                const file = event.target.elements.image.files[0];
                 if (!file) {
                     console.error('No file selected');
                     return;
@@ -143,11 +165,8 @@ export default {
                 console.error('Error while submitting file:', error);
             }
         },
-        async fileSubmit(event) {
+        async fileSubmit(file) {
             try {
-                event.preventDefault();
-
-                const file = event.target.elements.file.files[0];
                 if (!file) {
                     console.error('No file selected');
                     return;
@@ -173,9 +192,6 @@ export default {
                 console.error('Error while submitting file:', error);
             }
         },
-
-
-
         openFileInput() {
             this.$refs.fileInput.click();
         },
@@ -184,26 +200,44 @@ export default {
             const reader = new FileReader();
 
             reader.onload = async () => {
-                // Không cần imageDataUrl ở đây
-                await this.sendImg(file);
+                await this.fileSubmit(file);
             };
 
             reader.readAsDataURL(file);
         },
+        openPhotoInput() {
+            this.$refs.photoInput.click();
+        },
+        async handlePhotoChange(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
 
-        async sendImg(file) {
-            try {
-                const dataMess = {
-                    groupid: this.group._id,
-                    originalname: file.name,
-                    loai: "hinh_anh"
-                };
-                // const response = await MessageService.createMessImg(this.token, dataMess);
-                console.log(dataMess);
-            } catch (error) {
-                console.error('Error while sending image:', error);
+            reader.onload = async () => {
+                await this.photoSubmit(file);
+            };
+
+            reader.readAsDataURL(file);
+        },
+        showOptions(index) {
+            if (this.showDropdown[index]) {
+                this.showDropdown[index] = false;
+            } else {
+                this.showDropdown[index] = true;
             }
         },
+        // async sendImg(file) {
+        //     try {
+        //         const dataMess = {
+        //             groupid: this.group._id,
+        //             originalname: file.name,
+        //             loai: "hinh_anh"
+        //         };
+        //         // const response = await MessageService.createMessImg(this.token, dataMess);
+        //         console.log(dataMess);
+        //     } catch (error) {
+        //         console.error('Error while sending image:', error);
+        //     }
+        // },
         setActiveGroup(index) {
             this.activeGroupIndex = index;
         },
@@ -246,9 +280,12 @@ export default {
     margin-bottom: 10px;
     padding: 10px;
     border-radius: 10px;
+    position: relative;
+
 }
 
 .my-message-item {
+    position: relative;
     background-color: rgb(164, 219, 248);
     width: auto;
     min-width: 100px;
@@ -276,7 +313,7 @@ export default {
 }
 
 .message-name {
-    font-size: 12px
+    /* font-size: 12px */
 }
 
 .message-time {
@@ -297,5 +334,16 @@ export default {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+/* .message{
+    position: relative;
+} */
+
+.dropdown-container {
+  position: fixed;
+  top: 100;
+  left: 100;
+  z-index: 999;
 }
 </style>

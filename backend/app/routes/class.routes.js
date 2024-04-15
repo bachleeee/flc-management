@@ -13,7 +13,8 @@ const {
   addToClass,
   findArrayClassById,
   findOneClassSchedule,
-  findAllOfClass
+  findAllOfClass,
+  findMyClass
 } = require("../controllers/class.controller");
 
 const router = express.Router();
@@ -26,6 +27,8 @@ router.route("/:id([0-9a-fA-F]{24})").get(findOne).put(update).delete(deleteClas
 router.route("/findArrayClassById").get(findArrayClassById)
 
 router.route("/findAllOfClass").get(findAllOfClass)
+
+router.route("/findMyClass").get(findMyClass)
 
 router.route("/:name").get(findOneByName);
 

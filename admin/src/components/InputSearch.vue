@@ -31,3 +31,8 @@ export default {
     </div>
 </template>
 
+<style scoped>
+.input-group-append .btn{
+    z-index: 0;
+}
+</style>

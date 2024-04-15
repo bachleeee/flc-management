@@ -9,7 +9,7 @@
             </div>
             <div class="mt-2">
               <div class="row">
-                <div class="col-10">
+                <div class="col-12">
                   <table ref="scheduleTable" class="table">
                     <thead>
                       <tr>
@@ -60,12 +60,12 @@
                 <div class="col-2">
                   <h5 class="">Danh sách lớp học</h5>
                   <div class=" rounded p-1 bg-grey " style="height: 300px; overflow-y: auto;">
-                    <div class="classItems py-3 d-flex justify-content-between rounded mt-1" v-for="(classItem, index) in allClasses"
-                      :key="index" :style="{ backgroundColor: getColor(index) }">
+                    <div class="classItems py-3 d-flex justify-content-between rounded mt-1"
+                      v-for="(classItem, index) in allClasses" :key="index"
+                      :style="{ backgroundColor: getColor(index) }">
                       <div class="px-2">
                         {{ classItem.tenlop }}
                       </div>
-                      <!-- Kiểm tra xem có classname nào không khớp -->
                       <button class="btn btn-primary px-1 py-0"
                         v-if="shouldShowButton(classItem.tenlop) && classItem.hinhthuc == 'offline'"
                         @click="showForm[classItem._id] = true">
@@ -74,7 +74,6 @@
                       <button class="btn btn-danger px-1 py-0 " v-else @click="deleteAllClassSchedule(classItem._id)">
                         <i class="fa-solid fa-x"></i>
                       </button>
-                      <!-- Form cho từng lớp học -->
                       <div class="form-wrapper" v-if="showForm[classItem._id]">
                         <div class="form" style="z-index: 999;">
                           <div>
@@ -99,12 +98,12 @@
                   </div>
                   <h5 class="">Lịch nghỉ</h5>
                   <div class=" rounded p-1 bg-grey " style="height: 300px; overflow-y: auto;">
-                    <div class="classItems py-3 d-flex justify-content-between rounded" v-for="(dayOffItems, index) in daysOff"
-                      :key="index" style="background-color: white;">
+                    <div class="classItems py-3 d-flex justify-content-between rounded"
+                      v-for="(dayOffItems, index) in daysOff" :key="index" style="background-color: white;">
                       <div class="px-2">
                         {{ dayOffItems.noiDung }}
                       </div>
-                        
+
                     </div>
                   </div>
                 </div>
@@ -295,7 +294,7 @@ export default {
     this.getAllSchedules()
     this.getAllClasses()
     this.getAllRoom()
-    this.getAllDaysOff() 
+    this.getAllDaysOff()
 
   }
 };
@@ -354,14 +353,15 @@ table thead th {
 }
 
 ::-webkit-scrollbar {
-  width: 4px; /* Chiều rộng của thanh cuộn */
+  width: 4px;
+  /* Chiều rộng của thanh cuộn */
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.3); 
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 ::-webkit-scrollbar-track {
-  background-color: rgba(0, 0, 0, 0.1); 
+  background-color: rgba(0, 0, 0, 0.1);
 }
 </style>

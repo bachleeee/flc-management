@@ -31,12 +31,29 @@ exports.createClass = async (req, res, next) => {
 exports.findAll = async (req, res, next) => {
   let documents = [];
   try {
-    const { courseName } = req.query;
+    const { courseSlug } = req.query;
 
-    if (courseName) {
-      documents = await classService.findByCourseName(courseName);
+    if (courseSlug) {
+      documents = await classService.findBycourseSlug(courseSlug);
     } else {
       documents = await classService.findAll();
+    }
+  } catch (error) {
+    next(new ApiError("An error occurred while retrieving classs", 500));
+  }
+  return res.send(documents);
+};
+
+exports.findMyClass = async (req, res, next) => {
+  let documents = [];
+  try {
+    const { studentId } = req.query;
+    const { teacherId } = req.query;
+
+    if (studentId) {
+      documents = await classService.findClassByStudentId(studentId);
+    } else {
+      documents = await classService.findClassByTeacherId(teacherId);
     }
   } catch (error) {
     next(new ApiError("An error occurred while retrieving classs", 500));
@@ -54,7 +71,6 @@ exports.findArrayClassById = async (req, res, next) => {
   }
   return res.send(documents);
 };
-
 
 exports.findAllOfClass = async (req, res, next) => {
   let documents = [];
@@ -256,6 +272,11 @@ exports.createClassSchedule = async (req, res, next) => {
           buoi = "evening";
         }
 
+        const studentsWithAbsent = myClass.students.map(student => ({
+          ...student,
+          absent: "" 
+        }));
+
         const classSchedule = {
           tenlop: myClass.tenlop,
           phong: req.body.phong,
@@ -263,8 +284,9 @@ exports.createClassSchedule = async (req, res, next) => {
           gioBatDau,
           gioKetThuc,
           stt: sessionsCount + 1,
-          students: myClass.students,
-          teachers: myClass.teachers
+          students: studentsWithAbsent, 
+          teachers: myClass.teachers, 
+          classid
         };
 
         schedules.push(classSchedule);
@@ -280,6 +302,7 @@ exports.createClassSchedule = async (req, res, next) => {
     next(new ApiError("Lỗi tạo lịch học", 500));
   }
 };
+
 
 
 exports.deleteClassSchedule = async (req, res, next) => {

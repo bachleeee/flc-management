@@ -40,7 +40,8 @@
                             </thead>
                             <tbody>
                                 <ClassList v-if="filteredCoursesCount > 0" :courses="paginatedCourses"
-                                    v-model:activeIndex="activeIndex" :start-index="startIndex" :users="users"/>
+                                    v-model:activeIndex="activeIndex" :start-index="startIndex" :users="users"
+                                    :teachers="teachers" />
                                 <p v-else>Không có Lớp học.</p>
                             </tbody>
                             <tfoot>
@@ -92,7 +93,8 @@ export default {
             currentPage: 1,
             sortDirection: 'asc',
             sortField: 'name',
-            users:[]
+            users: [],
+            teachers: []
         };
     },
     watch: {
@@ -153,11 +155,17 @@ export default {
         },
         async getAllUsers() {
             try {
-                this.users = await UserService.getAllUser()
+                this.users = await UserService.getAllUser();
+                this.users.forEach(user => {
+                    if (user.role === 'teacher') {
+                        this.teachers.push(user);
+                    }
+                });
             } catch (error) {
                 console.log(error);
             }
         },
+
         refreshList() {
             this.retrieveCourses();
             this.activeIndex = -1;
@@ -186,7 +194,6 @@ export default {
 
                 return this.sortDirection === 'asc' ? comparison : -comparison;
             };
-
             this.filteredCourses.sort(compareFn);
         },
         changeSort(field) {

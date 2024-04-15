@@ -9,6 +9,9 @@ class ClassService {
     async getAllClass() {
         return (await this.api.get(`/`)).data;
     }
+    async getAllMyClass(teacherId) {
+        return (await this.api.get(`/findMyClass/?teacherId=${teacherId}`)).data;
+    }
     async getAllOffClass(data) {
         return (await this.api.get(`/findAllOfClass`, data)).data;
     }

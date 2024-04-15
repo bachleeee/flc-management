@@ -81,7 +81,7 @@ export default {
             orders: [],
             activeIndex: -1,
             searchText: "",
-            itemsPerPage: 7,
+            itemsPerPage: 10,
             currentPage: 1,
             sortDirection: 'asc',
             sortField: 'name'

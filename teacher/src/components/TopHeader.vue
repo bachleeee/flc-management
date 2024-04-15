@@ -64,7 +64,6 @@ export default {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
       this.myAnnounce = await AnnounceService.getMyAnnounce(user._id);
-      console.log(this.myAnnounce);
       if (this.myAnnounce) {
         // Sắp xếp mảng theo thời gian tạo giảm dần
         this.myAnnounce.sort((a, b) => new Date(b.createAt) - new Date(a.createAt));
@@ -76,7 +75,6 @@ export default {
           }
         }
         this.countIsNotSeen = countIsNotSeen;
-        console.log(this.countIsNotSeen);
       }
     }
   } catch (error) {

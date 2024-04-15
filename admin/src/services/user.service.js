@@ -9,6 +9,9 @@ class UserService {
     async getAllUser() {
         return (await this.api.get("/")).data;
     }
+    async getAllTeachers() {
+        return (await this.api.get(`/?role=${teacher}`)).data;
+    }
     async getAllOrder() {
         return (await this.api.get("/order/getall")).data;
     }

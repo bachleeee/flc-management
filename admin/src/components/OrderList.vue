@@ -1,5 +1,5 @@
 <template>
-  <tr v-for="(order, index) in orders" :key="order._id" @click="updateActiveIndex(index)">
+  <tr v-for="(order, index) in sortOrder(orders)" :key="order._id" @click="updateActiveIndex(index)">
     <td class="col-1 table-items">{{ startIndex + index }}</td>
     <td class="col-1 table-items">{{ order.orderby }}</td>
     <td class="col-1 table-items">{{ order.className }}</td>
@@ -38,6 +38,16 @@ export default {
   },
   emits: ["update:activeIndex"],
   methods: {
+    sortOrder(orders) {
+  return orders.sort((a, b) => {
+    const dateA = new Date(a.createdAt);
+    const dateB = new Date(b.createdAt);
+
+    return dateB - dateA;
+  });
+},
+
+
     formatCurrency(price) {
       const formattedPrice = new Intl.NumberFormat('vi-VN', {
         style: 'currency',
@@ -99,7 +109,6 @@ export default {
         console.error("Error adding to class:", error);
       }
     },
-
     isDisabled(studentName, className, status) {
       return status === 'waiting';
     },

@@ -1,21 +1,21 @@
 <template>
   <tr v-for="(course, index) in courses" :key="course._id" @click="updateActiveIndex(index)">
-    <td class="col-1 table-items">{{ startIndex + index }}</td>
-    <td class="col-2 table-items">{{ course.tenlop }}</td>
-    <td class="col-1 table-items">{{ course.hinhthuc }}</td>
-    <td v-if="course.hinhthuc === 'online'" class="col-1 table-items">{{ course.siso }}</td>
-    <td v-else class="col-1 table-items">{{ course.siso }}/{{ course.soluongtoida }}</td>
-    <td class="col-2 table-items" :class="getStatusClass(course.ngaybatdau, course.ngayketthuc)">
+    <td class=" table-items">{{ startIndex + index }}</td>
+    <td class=" table-items">{{ course.tenlop }}</td>
+    <td class=" table-items">{{ course.hinhthuc }}</td>
+    <td v-if="course.hinhthuc === 'online'" class=" table-items">{{ course.siso }}</td>
+    <td v-else class=" table-items">{{ course.siso }}/{{ course.soluongtoida }}</td>
+    <td class=" table-items" :class="getStatusClass(course.ngaybatdau, course.ngayketthuc)">
       {{ isOngoing(course.ngaybatdau, course.ngayketthuc) }}
     </td>
-    <td v-if="course.hinhthuc == 'offline'" class="col-1 table-items">{{ formattedDays(course.thu) }}</td>
-    <td v-else class="col-1 table-items">-</td>
+    <td v-if="course.hinhthuc == 'offline'" class=" table-items">{{ formattedDays(course.thu) }}</td>
+    <td v-else class=" table-items">-</td>
 
-    <td v-if="course.hinhthuc == 'offline'" class="col-1 table-items">{{ formatHour(course.ngaybatdau) }}</td>
-    <td v-else class="col-1 table-items">-</td>
+    <td v-if="course.hinhthuc == 'offline'" class=" table-items">{{ formatHour(course.ngaybatdau) }}</td>
+    <td v-else class=" table-items">-</td>
 
-    <td class="col-3">
-      <button class="btn btn-sm btn-warning mr-4" @click="toggleDetail(index)">
+    <td class="">
+      <button class="btn btn-sm btn-warning mr-4" @click="showDetail[course._id] = true">
         Detail
       </button>
       <button class="btn btn-sm btn-danger mr-4" @click="deleteCourse(index, course._id)">
@@ -24,17 +24,37 @@
       <button class="btn btn-sm btn-info" @click="modifyCourse(index, course._id)">
         Edit
       </button>
-      <div v-if="showDetail[index]" class="class-detail">
-        <div class="d-flex justify-content-center p-4" style="background-color: white; flex-direction: column;">
-          Danh sách học viên của lớp:
-          <ul>
-            <li v-for="(course, index) in courses" :key="course._id">
-            <li v-for="(student, studentIndex) in course.students" :key="studentIndex">
-              {{ studentIndex+1 }}.  {{ student.name }}
-            </li>
-            </li>
-          </ul>
-          <button class="btn btn-danger" @click="showDetail[index] = false">Đóng</button>
+      <div class="form-wrapper" v-if="showDetail[course._id]">
+        <div class="form" style="z-index: 10000; height: 600px;">
+          <div style="text-align: center; font-size: 20px; font-weight: bold; text-transform: uppercase;">
+            <label for="soluong">Danh sách lớp {{ course.tenlop }}</label>
+          </div>
+          <div v-if="course.teachers.length > 0" class="d-flex justify-content-between">
+            <div v-for="(teacher, teacherIndex) in course.teachers">
+              GV: {{ teacher.name }}
+            </div>
+          </div>
+          <div v-else>
+            Chưa sắp xếp giáo viên
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>STT</th>
+                <th>Tên Học viên</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(student, studentIndex) in sortStudents(course.students)" :key="studentIndex">
+                <td>{{ studentIndex + 1 }}</td>
+                <td>{{ student.name }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="mt-3">
+            <button class="btn btn-primary mr-4" @click="">Submit</button>
+            <button class="btn btn-danger" @click="showDetail[course._id] = false">Đóng</button>
+          </div>
         </div>
       </div>
     </td>
@@ -48,7 +68,7 @@ import ClassService from "@/services/class.service";
 export default {
   data() {
     return {
-      showDetail: [],
+      showDetail: {},
       studentsOfClass: [],
     }
   },
@@ -60,6 +80,9 @@ export default {
   },
   emits: ["update:activeIndex"],
   methods: {
+    async getClassOfTeach(){
+      
+    },
     formatCurrency(price) {
       const formattedPrice = new Intl.NumberFormat('vi-VN', {
         style: 'currency',
@@ -114,17 +137,8 @@ export default {
       }
       try {
         this.studentsOfClass = await ClassService.getAllOffClass(data)
-        console.log(this.studentsOfClass);
       } catch (error) {
         console.log(error)
-      }
-    },
-    toggleDetail(index) {
-
-      if (this.showDetail[index]) {
-        this.showDetail[index] = false;
-      } else {
-        this.showDetail[index] = true;
       }
     },
     formattedDays(days) {
@@ -133,19 +147,36 @@ export default {
         const selectedDays = days.map(day => daysOfWeek[day]);
         return selectedDays.join(', ');
       } else {
-        return ''; // hoặc bất kỳ giá trị mặc định nào bạn muốn trả về cho trường hợp không phải mảng
+        return '';
       }
     },
     formatHour(dateTimeString) {
       const hour = moment(dateTimeString).format('HH:mm');
       return hour;
     },
+    sortStudents(students) {
+      students.sort((a, b) => {
+        const nameA = a.name.split(' ')
+        const lastWordPartA = nameA[nameA.length - 1]
+        const nameB = b.name.split(' ')
+        const lastWordPartB = nameB[nameB.length - 1]
+
+        return lastWordPartA.localeCompare(lastWordPartB);
+      });
+
+      return students;
+    },
+    filterTeacher(teachers,ngaybatdau) {
+      for(teacher in teachers){
+        
+      }
+    }
   },
   mounted() {
-    // Gọi phương thức getAllStudentOfClass() cho từng lớp học trong danh sách courses
     this.courses.forEach(course => {
       this.getAllStudentOfClass(course.tenlop);
     });
+
   }
 };
 </script>
@@ -185,4 +216,40 @@ ul {
   z-index: 9999;
   background-color: rgba(0, 0, 0, 0.5);
 }
+
+
+.form-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form {
+  background-color: white;
+  padding: 30px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 
+table,
+th,
+td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+table thead th {
+    text-transform: uppercase;
+    background-color: rgb(238, 238, 238);
+    border: 1px solid black;
+    text-align: center;
+} */
 </style>

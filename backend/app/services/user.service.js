@@ -63,6 +63,21 @@ class UserService {
       throw new Error(error);
     }
   }
+  async findByRole(role) {
+    try {
+      const users = await this.databaseSetvices.users
+        .find({
+          role: {
+            $regex: new RegExp(role),
+            $options: "i",
+          },
+        })
+        .toArray();
+      return users;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
   
   async findOneByName(name) {
     try {

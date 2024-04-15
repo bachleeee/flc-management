@@ -19,7 +19,7 @@ class GroupService {
     const result = await this.databaseSetvices.class.findOneAndUpdate(
       group,
       {
-        $set: { siso: 0 },
+        $set: { siso: 0, students:[],teachers:[] },
       },
       {
         upsert: true,
@@ -53,6 +53,27 @@ class GroupService {
     }
   }
 
+  async findClassByStudentId(studentId) {
+    try {
+      const groups = await this.databaseSetvices.class.find({
+        students: { $elemMatch: { id: studentId } }
+      }).toArray();
+      return groups;
+    } catch (error) {
+      throw new Error(error);
+    }
+}
+  async findClassByTeacherId(teacherId) {
+    try {
+      const groups = await this.databaseSetvices.class.find({
+        teachers: { $elemMatch: { id: teacherId } }
+      }).toArray();
+      return groups;
+    } catch (error) {
+      throw new Error(error);
+    }
+}
+
   async findByCourseId(courseid) {
     try {
       const group = await this.databaseSetvices.class.find({
@@ -75,30 +96,11 @@ class GroupService {
     }
   }
   
-  async findByNamePaged(name, page, limit) {
-    try {
-      const skip = (page - 1) * limit;
-      const groups = await this.databaseSetvices.class
-        .find({
-          name: {
-            $regex: new RegExp(name),
-            $options: "i",
-          },
-        })
-        .skip(skip)
-        .limit(limit)
-        .toArray();
-      return groups;
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
-  
-  async findByCourseName(courseName) {
+  async findBycourseSlug(courseSlug) {
     try {
       const groups = await this.databaseSetvices.class
         .find({
-          courseName: courseName,
+          courseSlug: courseSlug,
         })
         .toArray();
       return groups;
@@ -107,26 +109,6 @@ class GroupService {
     }
   }
   
-  async findByNameAndCategoryPaged(name, category, page, limit) {
-    try {
-      const skip = (page - 1) * limit;
-      const groups = await this.databaseSetvices.class
-        .find({
-          name: {
-            $regex: new RegExp(name),
-            $options: "i",
-          },
-          category: category,
-        })
-        .skip(skip)
-        .limit(limit)
-        .toArray();
-      return groups;
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
-
   async findBySlug(slug) {
     try {
       const group = await this.databaseSetvices.class.findOne({

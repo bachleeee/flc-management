@@ -6,8 +6,8 @@ class ClassService {
     async getClassByCourse(id) {
         return (await this.api.get(`/course/${id}`)).data;
     }
-    async getAllByCourseName(courseName) {
-        return (await this.api.get(`/?courseName=${courseName}`)).data;
+    async getAllByCourseName(courseSlug) {
+        return (await this.api.get(`/?courseSlug=${courseSlug}`)).data;
     }
     async getAllClass() {
         return (await this.api.get(`/`)).data;

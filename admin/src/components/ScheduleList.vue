@@ -12,6 +12,9 @@
                 Buổi {{ scheduleItems.stt }}
             </li>
             <li>
+                GV: {{ scheduleItems.teachers[0].name }}
+            </li>
+            <li>
                 Phòng {{ scheduleItems.phong }} <i style="color: red;" v-if="scheduleItems.isCommonRoom == true"
                     class="fa-solid fa-circle-exclamation"></i>
             </li>
@@ -153,9 +156,10 @@ ul {
 .scheduleItems {
     font-size: 15px;
     font-weight: normal;
-    /* display: flex;
+    display: flex;
     flex-direction: column;
-    border: solid 1px black; */
+    border: solid 1px black;
+    align-items: center;
 }
 
 .delete-btn {

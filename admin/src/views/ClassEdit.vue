@@ -38,7 +38,6 @@ export default {
     async getClass() {
       try {
         this.classData = await ClassService.getById(this.$route.params.id);
-        console.log('thông tin lớp học',this.classData)
       } catch (error) {
         console.log(error);
         this.$router.push({
@@ -56,9 +55,7 @@ export default {
         const response = await CourseService.getAllCourse();
         if (response) {
           this.courses = response
-          console.log('danh sách khóa học',this.courses)
         }
-
       } catch (error) {
         console.log(error)
       }

@@ -2,11 +2,11 @@
   <div>
     <div v-for="(group, index) in myGroups" :key="index">
       <div class="group-container">
-        <div class="mess-detail" v-if="showGroups">
+        <div class="mess-detail" v-if="showGroups[group._id]">
           <MessageDetail :group="group" :token="token"></MessageDetail>
         </div>
         <div class="d-flex align-items-center" style="flex-direction: column;">
-          <div class="btn-group" @click="toggleGroups">
+          <div class="btn-group" @click="toggleGroups(group._id)">
             <i class="fa-solid fa-user-group"></i>
           </div>
           <span style="font-size: 13px; font-weight:500 ; background-color: #f4960a;">{{ group.groupName }}</span>
@@ -25,7 +25,7 @@ export default {
     return {
       myGroups: [],
       token: '',
-      showGroups: false,
+      showGroups: {}, // Thay đổi thành một đối tượng
     }
   },
   components: {
@@ -48,15 +48,17 @@ export default {
         console.error('Error while fetching groups:', error);
       }
     },
-    toggleGroups() {
-      this.showGroups = !this.showGroups;
-    }
+    toggleGroups(groupId) {
+  this.$data.showGroups[groupId] = !this.$data.showGroups[groupId];
+}
+
   },
   mounted() {
     this.getMyGroups();
   }
 }
 </script>
+
 
 <style scoped>
 .fa-message,

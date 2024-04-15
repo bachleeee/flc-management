@@ -79,36 +79,48 @@ exports.findOne = async (req, res, next) => {
   }
 };
 
+const updateStudent = (students, updatedStudent) => {
+  const index = students.findIndex(student => student.id === updatedStudent.id);
+  if (index !== -1) {
+      // Tìm thấy sinh viên, cập nhật thông tin mới
+      students[index] = updatedStudent;
+  } else {
+      // Không tìm thấy sinh viên, xử lý lỗi hoặc thêm sinh viên mới vào mảng
+      // Ví dụ: throw new Error("Student not found");
+  }
+};
+
 exports.update = async (req, res, next) => {
   if (Object.keys(req.body).length === 0) {
-    return next(new ApiError("Update data cannot be empty", 400));
+      return next(new ApiError("Update data cannot be empty", 400));
   }
   const { id } = req.params;
 
   const updatedData = {
-    phong: req.body.phong,
-    buoi: req.body.buoi,
+      phong: req.body.phong,
+      buoi: req.body.buoi,
+      students: req.body.students,
   };
 
   try {
+      if (req.body.gioBatDau) {
+          const gioBatDau = new Date(req.body.gioBatDau);
+          const gioKetThuc = new Date(gioBatDau);
 
-    if (req.body.gioBatDau) {
-      const gioBatDau = new Date(req.body.gioBatDau);
-      const gioKetThuc = new Date(gioBatDau);
+          gioKetThuc.setHours(gioKetThuc.getHours() + 2);
 
-      gioKetThuc.setHours(gioKetThuc.getHours() + 2);
+          updatedData.gioKetThuc = gioKetThuc;
+          updatedData.gioBatDau = gioBatDau;
+      }
 
-      updatedData.gioKetThuc = gioKetThuc;
-      updatedData.gioBatDau = gioBatDau;
-    }
+      const updatedDocument = await scheduleService.update(id, updatedData);
 
-    const updatedDocument = await scheduleService.update(id, updatedData);
-
-    return res.send(updatedDocument);
+      return res.send(updatedDocument);
   } catch (error) {
-    next(new ApiError(`An error occurred while updating class ${id}`, 500));
+      next(new ApiError(`An error occurred while updating class ${id}`, 500));
   }
 };
+
 
 exports.deleteSchedule = async (req, res, next) => {
   const { id } = req.params;

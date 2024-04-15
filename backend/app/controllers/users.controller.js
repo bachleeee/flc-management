@@ -87,6 +87,23 @@ exports.findAll = async (req, res, next) => {
   let documents = [];
   try {
     const { name } = req.query;
+    const { role } = req.query;
+    if (name) {
+      documents = await userService.findByName(name);
+    } else if (role) {
+      documents = await userService.findByRole(role);
+    }{
+      documents = await userService.findAll();
+    }
+  } catch (error) {
+    next(new ApiError("An error accurred while retrieving users", 500));
+  }
+  return res.send(documents);
+};
+exports.findAllTeacher = async (req, res, next) => {
+  let documents = [];
+  try {
+    const { name } = req.query;
     if (name) {
       documents = await userService.findByName(name);
     } else {

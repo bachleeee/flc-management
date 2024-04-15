@@ -77,10 +77,8 @@ export default {
         console.log('API Response course:', response);
         if (response) {
           this.course = response;
-
-          const courseName = response.name;
           try {
-            const myResponse = await ClassService.getAllByCourseName(courseName);
+            const myResponse = await ClassService.getAllByCourseName(slug);
             if (myResponse) {
               // const currentDate = new Date();
               // const futureClasses = myResponse.filter(myClass => {

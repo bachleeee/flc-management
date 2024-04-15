@@ -7,12 +7,33 @@
         <div style="background-color: white;">
             <ul class="message-list">
                 <li v-for="(message, index) in messages" :key="index" class="m-2">
-                    <div :class="myMessage(message.userid)">
-                        <div class="message-name">{{ message.name }}</div>
-                        <div class="message-text">{{ message.text }}</div>
-                        <div class="message-time">{{ formatTime(message.createdAt) }}</div>
+                    <div v-if="message.loai === 'van_ban'">
+                        <div :class="myMessage(message.userid)">
+                            <div class="message-name">{{ message.name }}</div>
+                            <div class="message-text">{{ message.text }}</div>
+                            <div class="message-time">{{ formatTime(message.createdAt) }}</div>
+                        </div>
                     </div>
-
+                    <div v-else-if="message.loai === 'hinh_anh'">
+                        <div :class="myMessage(message.userid)">
+                            <div class="message-name">{{ message.name }}</div>
+                            <div class="image-wrapper">
+                                <img :src="'http://localhost:5000/uploads/' + message.fileName" alt=""
+                                    class="fit-image">
+                            </div>
+                            <div class="message-time">{{ formatTime(message.createdAt) }}</div>
+                        </div>
+                    </div>
+                    <div v-else>
+                        <div :class="myMessage(message.userid)">
+                            <div class="message-name">{{ message.name }}</div>
+                            <div class="image-wrapper">
+                                <embed :src="'http://localhost:5000/uploads/' + message.fileName" />{{ message.fileName
+                                }}
+                            </div>
+                            <div class="message-time">{{ formatTime(message.createdAt) }}</div>
+                        </div>
+                    </div>
                 </li>
             </ul>
             <div class="textarea-wrapper d-flex">
@@ -74,7 +95,7 @@ export default {
                 const dataMess = {
                     groupid: this.group._id,
                     text: this.newMessage,
-                    loai: "van ban"
+                    loai: "van_ban"
                 }
                 await MessageService.create(this.token, dataMess);
                 this.newMessage = '';
@@ -101,8 +122,8 @@ export default {
     mounted() {
         this.getGroupMessage();
         this.interval = setInterval(() => {
-        this.getGroupMessage();
-    }, 1000);
+            this.getGroupMessage();
+        }, 1000);
     },
     watch: {
         group: {
@@ -155,10 +176,24 @@ export default {
 .message-name {
     font-size: 12px
 }
+
 .message-time {
     font-size: 12px
 }
+
 .message-text {
     font-size: 15px
+}
+
+.image-wrapper {
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+}
+
+.fit-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 </style>
