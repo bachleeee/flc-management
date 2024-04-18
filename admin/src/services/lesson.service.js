@@ -24,13 +24,13 @@ class lessonService {
     async getAllLessonVideo(lessonid) {
         return (await this.api.get(`/video/${lessonid}`)).data;
     }
-    async getById(id) {
+    async getVideoById(id) {
         return (await this.api.get(`/video/${id}`)).data;
     }
-    async update(id, data) {
+    async updateVid(id, data) {
         return (await this.api.put(`/video/${id}`, data)).data;
     }
-    async delete(id) {
+    async deleteVid(id) {
         return (await this.api.delete(`/video/${id}`)).data;
     }
 }

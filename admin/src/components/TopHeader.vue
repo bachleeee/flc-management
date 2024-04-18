@@ -4,7 +4,7 @@
       <ul class="m-2 d-flex align-items-center">
         <li class="mx-3">
           <router-link to="/message">
-            <i class="far fa-envelope"></i> <!-- Icon lá thư -->
+            <i class="far fa-envelope"></i> 
           </router-link>
         </li>
         <li class="mx-3" @click="showOptions">
@@ -81,8 +81,6 @@ export default {
         console.error("Không thể lấy thông báo:", error);
       }
     },
-
-
     formatDate(dateString) {
       const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
       return new Date(dateString).toLocaleDateString('en-GB', options);
@@ -90,8 +88,8 @@ export default {
 
   },
   mounted() {
-    this.getMyAnnouce(); // Gọi hàm lấy thông báo khi component được mount lần đầu tiên
-    setInterval(this.getMyAnnouce, 2000); // Gọi lại hàm lấy thông báo mỗi 10 giây
+    this.getMyAnnouce(); 
+    setInterval(this.getMyAnnouce, 2000); 
   }
 }
 </script>
@@ -132,8 +130,7 @@ nav a:hover {
   position: absolute;
   top: 50px;
   right: 50px;
-  max-height: 300px;
-  /* Chiều cao tối đa */
+  max-height: 200px; /* Thay đổi giá trị max-height thành 200px hoặc giá trị phù hợp khác để làm cho thanh cuộn nhỏ hơn */
   overflow-y: auto;
   z-index: 999;
 }

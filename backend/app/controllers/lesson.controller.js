@@ -230,7 +230,9 @@ exports.update = async (req, res, next) => {
         return next(new ApiError("Update data cannot be empty", 400));
     }
     const { id } = req.params;
-    const _data = req.body;
+    const _data = {
+        name : req.body.name
+    };
     try {
         const document = await groupService.update(id, _data);
         if (!document) {

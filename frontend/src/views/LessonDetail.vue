@@ -92,7 +92,6 @@ export default {
       const responseProgress = await ProgressService.getMyProgress(token,classid, this.lesson._id);
       if (responseProgress) {
         this.myProgress = responseProgress;
-        console.log("Dữ liệu tiến độ:", this.myProgress);
       } else {
         console.error("Không tìm thấy thông tin tiến độ.");
       }
@@ -105,7 +104,6 @@ export default {
       const responseDoc = await LessonService.getDoc(this.lesson._id);
       if (responseDoc) {
         this.documents = responseDoc;
-        console.log("Dữ liệu tài liệu:", this.documents);
       } else {
         console.error("Không tìm thấy thông tin tài liệu.");
       }
@@ -118,7 +116,6 @@ export default {
       const responseVid = await LessonService.getVid(this.lesson._id);
       if (responseVid) {
         this.videos = responseVid;
-        console.log("Dữ liệu video:", this.videos);
       } else {
         console.error("Không tìm thấy thông tin video.");
       }

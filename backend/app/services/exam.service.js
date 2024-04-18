@@ -19,7 +19,7 @@ class ExamService {
     const result = await this.databaseServices.exam.findOneAndUpdate(
       exam,
       {
-        $setOnInsert: {},
+        $setOnInsert: { lessonId: []},
       },
       {
         upsert: true,
@@ -37,7 +37,7 @@ class ExamService {
       if (!exam) {
         return null;
       }
-      return exam; 
+      return exam;
     } catch (error) {
       throw new Error(error);
     }
@@ -45,15 +45,14 @@ class ExamService {
 
   async findByLessonId(lessonId) {
     try {
-        const exam = await this.databaseServices.exam.find({
-            lessonId: lessonId,
-        }).toArray(); // Thêm dấu ngoặc để gọi hàm toArray
-        return exam; 
+      const exam = await this.databaseServices.exam.find({
+        lessonId: lessonId,
+      }).toArray();
+      return exam;
     } catch (error) {
-        throw new Error(error);
+      throw new Error(error);
     }
-}
-
+  }
 
   async findAll() {
     try {
@@ -95,7 +94,37 @@ class ExamService {
     } catch (error) {
       throw new Error(error);
     }
-}
+  }
+  
+  async updateLessonId(id, lessonId) {
+    const filter = {
+      _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
+    };
+  
+    const update = {
+      $addToSet: {
+        lessonId: lessonId
+      },
+    };
+    const options = {
+      returnDocument: 'after',
+    };
+    try {
+      let updatedClass = await this.databaseServices.exam.findOneAndUpdate(
+        filter,
+        update,
+        options
+      );
+
+      if (!updatedClass) {
+        throw new Error('Class not found');
+      }
+
+      return updatedClass;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 
 }
 const databaseSetvices = require("../utils/mongodb.util");

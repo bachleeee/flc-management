@@ -2,15 +2,17 @@
   <div class="container">
     <Form @submit="submitExam" :validation-schema="examFormSchema">
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
           <div class="form-group">
-            <label for="title">Tiêu đề</label>
-            <Field name="title" type="text" class="form-control" v-model="examLocal.title" />
-            <ErrorMessage name="title" class="error-feedback" />
+            <label for="question">Câu hỏi</label>
+            <Field name="question" type="text" class="form-control" v-model="examLocal.question" />
+            <ErrorMessage name="question" class="error-feedback" />
           </div>
         </div>
+      </div>
 
-        <div class="col-md-6">
+
+      <div class="row">  <div class="col-md-6">
           <div class="form-group">
             <label for="type">Loại</label>
             <select name="type" class="form-control" v-model="examLocal.type">
@@ -20,21 +22,7 @@
             <ErrorMessage name="type" class="error-feedback" />
           </div>
         </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-12">
-          <div class="form-group">
-            <label style="color: #205eb4; text-transform: uppercase;" for="">Câu hỏi</label>
-            <label for="question">Nội dung câu hỏi</label>
-            <Field name="question" type="text" class="form-control" v-model="examLocal.question" />
-            <ErrorMessage name="question" class="error-feedback" />
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-6">
           <label for="questionDetail">Chi tiết câu hỏi</label>
           <input name="questionDetail" type="file" accept="image/*" @change="handleImageUpload">
           <img v-if="examLocal.questionDetail" :src="examLocal.questionDetail" alt="Question Image"
@@ -47,61 +35,72 @@
       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
-            <label for="optionA"></label>
+            <label for="optionA">A</label>
             <Field name="optionA" type="text" class="form-control" v-model="examLocal.optionA" />
             <ErrorMessage name="optionA" class="error-feedback" />
           </div>
         </div>
         <div class="col-md-6">
           <div class="form-group">
-            <label for="optionB"></label>
+            <label for="optionB">B</label>
             <Field name="optionB" type="text" class="form-control" v-model="examLocal.optionB" />
             <ErrorMessage name="optionB" class="error-feedback" />
           </div>
         </div>
         <div class="col-md-6">
           <div class="form-group">
-            <label for="optionC"></label>
+            <label for="optionC">C</label>
             <Field name="optionC" type="text" class="form-control" v-model="examLocal.optionC" />
             <ErrorMessage name="optionC" class="error-feedback" />
           </div>
         </div>
         <div class="col-md-6">
           <div class="form-group">
-            <label for="optionD"></label>
+            <label for="optionD">D</label>
             <Field name="optionD" type="text" class="form-control" v-model="examLocal.optionD" />
             <ErrorMessage name="optionD" class="error-feedback" />
           </div>
         </div>
       </div>
+
       <label for="questionDetail">Đáp án</label>
       <div class="row">
         <div class="col-md-2">
           <div class="form-group">
             <label>
-              <input type="radio" name="correctOption" value="A" v-model="examLocal.correctOption"> A
+              <input type="radio" name="correctOption" :value="examLocal.optionA" v-model="examLocal.correctOption"> A
             </label>
           </div>
         </div>
         <div class="col-md-2">
           <div class="form-group">
             <label>
-              <input type="radio" name="correctOption" value="B" v-model="examLocal.correctOption"> B
+              <input type="radio" name="correctOption" :value="examLocal.optionB" v-model="examLocal.correctOption"> B
             </label>
           </div>
         </div>
         <div class="col-md-2">
           <div class="form-group">
             <label>
-              <input type="radio" name="correctOption" value="C" v-model="examLocal.correctOption"> C
+              <input type="radio" name="correctOption" :value="examLocal.optionC" v-model="examLocal.correctOption"> C
             </label>
           </div>
         </div>
         <div class="col-md-2">
           <div class="form-group">
             <label>
-              <input type="radio" name="correctOption" value="D" v-model="examLocal.correctOption"> D
+              <input type="radio" name="correctOption" :value="examLocal.optionD" v-model="examLocal.correctOption"> D
             </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label for="explain">Giải thích</label>
+            <textarea name="explain" type="text" class="form-control" v-model="examLocal.explain" rows="5"></textarea>
+            <ErrorMessage name="explain" class="error-feedback" />
           </div>
         </div>
       </div>
@@ -141,7 +140,6 @@ export default {
   },
   methods: {
     submitExam() {
-      console.log('click')
       this.$emit("submit:exam", this.examLocal);
     },
     deleteExam() {
@@ -152,6 +150,7 @@ export default {
       const reader = new FileReader();
       reader.onload = (e) => {
         this.examLocal.questionDetail = e.target.result;
+        this.examLocal.file = file;
       };
       reader.readAsDataURL(file);
     },

@@ -6,8 +6,15 @@ class VideoService {
     async create(data) {
         return (await this.api.post(`/`, data)).data;
     }
-    async getAllLessonExam() {
-        return (await this.api.get(`/`)).data;
+    async addExam(id,data) {
+        return (await this.api.post(`/addExamToLesson/${id}`, data)).data;
+    }
+    async getAllLessonExam(lessonId) {
+        if (lessonId != null)
+            return (await this.api.get(`/?lessonId=${lessonId}`)).data;
+        else {
+            return (await this.api.get(`/`)).data;
+        }
     }
     async getById(id) {
         return (await this.api.get(`/${id}`)).data;

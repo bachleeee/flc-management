@@ -92,7 +92,6 @@ export default {
     async getMyClass() {
       try {
         const className = this.$route.params.className;
-        console.log(className);
         this.myClass = await ClassService.getClass(className);
 
         if (this.myClass) {
@@ -101,8 +100,10 @@ export default {
           console.log("Danh sách bài học:", this.lesson);
 
           const token = localStorage.getItem('token');
-          this.myProgress = await ProgressService.getMyProgress(token, this.myClass._id);
-          console.log("Tiến độ học tập của bạn:", this.myProgress);
+          const responseProgress = await ProgressService.getMyProgress(token, this.myClass._id);
+          if (responseProgress) {
+            this.myProgress = responseProgress
+          }
         } else {
           console.log("Không tìm thấy lớp học phù hợp.");
         }
@@ -137,17 +138,12 @@ export default {
 
         if (this.authStore.isLoggedIn && this.myClass) {
           const existingProgress = await ProgressService.getMyProgress(token, this.myClass._id);
-          
+
           const hasExistingProgress = existingProgress.some(progress => progress.lessonid === lessonId);
 
           if (!hasExistingProgress) {
             await ProgressService.createProgress(token, data);
-            console.log("Tiến độ đã được tạo cho bài học có ID:", lessonId);
-          } else {
-            console.log("Tiến trình đã tồn tại cho bài học có ID:", lessonId);
           }
-        } else {
-          console.error('Không có thông tin tiến độ hoặc người dùng chưa đăng nhập.');
         }
       } catch (error) {
         console.error("Lỗi khi tạo tiến độ:", error);

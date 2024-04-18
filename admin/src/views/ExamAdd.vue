@@ -19,7 +19,8 @@
 
 <script>
 import ExamForm from "@/components/ExamForm.vue";
-import ExamService from "@/services/exam.service";
+import axios from 'axios';
+import ExamService from "@/services/Exam.service";
 
 export default {
   components: {
@@ -28,8 +29,6 @@ export default {
   data() {
     return {
       exam: {
-        lessonid: '',
-        title: '',
         type: '',
         questionDetail: '',
         question: '',
@@ -39,6 +38,7 @@ export default {
         optionC: '',
         optionD: '',
         explain: '',
+        file: ''
       },
       message: "",
       isRoleFieldDisabled: false,
@@ -47,14 +47,41 @@ export default {
   },
   methods: {
     async createExam(data) {
-      try {
-        await ExamService.create(data);
-        window.alert("Bài tập được thêm thành công.");
-        setTimeout(() => {
-          this.$router.push({ name: "exam" });
-        }, 2000);
-      } catch (error) {
-        console.log(error);
+      if (data.file != '') {
+        console.log(data)
+        try {
+          const formData = new FormData();
+          formData.append('image', data.file);
+
+          formData.append('optionA', data.optionA);
+          formData.append('optionB', data.optionB);
+          formData.append('optionC', data.optionC);
+          formData.append('optionD', data.optionD);
+          formData.append('correctOption', data.correctOption);
+          formData.append('title', data.title);
+          formData.append('question', data.question);
+          formData.append('explain', data.explain);
+          formData.append('fileName', data.file.name);
+
+          const uploadResponse = await axios.post('http://localhost:5000/api/exam/createExamWithImg', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+          console.log('Image uploaded successfully!', uploadResponse);
+        } catch (error) {
+          console.error('Error while submitting file:', error);
+        }
+      } else {
+        try {
+          await ExamService.create(data);
+          window.alert("Câu hỏi được thêm thành công.");
+          setTimeout(() => {
+            this.$router.push({ name: "exam" });
+          }, 2000);
+        } catch (error) {
+          console.log(error);
+        }
       }
     },
   },

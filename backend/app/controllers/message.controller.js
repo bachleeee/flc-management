@@ -19,9 +19,9 @@ const storage = multer.diskStorage({
     cb(null, 'uploads/');
   },
   filename: function (req, file, cb) {
-    const dateTimeString = getCurrentDateTimeString(); // Lấy chuỗi thời gian hiện tại
+    const dateTimeString = getCurrentDateTimeString(); 
     const originalname = file.originalname; 
-    cb(null, dateTimeString + '-' + originalname); // Sử dụng chuỗi thời gian hiện tại trong tên file
+    cb(null, dateTimeString + '-' + originalname); 
   }
 });
 
@@ -82,7 +82,7 @@ exports.createMessageImg = [
         loai: req.body.loai,
         userid: req.body.userid,
         name: user.name,
-        fileName: dateTimeString  + '-' + req.body.fileName, // Sử dụng currentTime ở đây
+        fileName: dateTimeString  + '-' + req.body.fileName, 
         groupid: req.body.groupid,
         createdAt: new Date(),
       };

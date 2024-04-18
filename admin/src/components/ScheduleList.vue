@@ -26,6 +26,62 @@
                     Edit
                 </button>
             </li>
+            <li >
+                <button class="btn btn-sm btn-warning" v-if="isToday(scheduleItems.gioBatDau)"
+                    @click="showForm[scheduleItems._id] = true">
+                    Điểm danh
+                </button>
+            </li>
+            <div class="form-wrapper" v-if="showForm[scheduleItems._id]">
+                <div class="form" style="z-index: 999; height: 600px;">
+                    <div>
+                        <div style="text-align: center; font-size: 20px; font-weight: bold; text-transform: uppercase;">
+                            <label for="soluong">Điểm danh lớp {{ scheduleItems.tenlop }}</label>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <div v-for="(teacher, teacherIndex) in scheduleItems.teachers">
+                                GV: {{ teacher.name }}
+                            </div>
+                            <div>Ngày {{ formattedDate(scheduleItems.gioBatDau) }}
+                            </div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Tên Sinh viên</th>
+                                    <th>Có mặt</th>
+                                    <th>Vắng có phép</th>
+                                    <th>Vắng không phép</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(student, studentIndex) in sortStudents(scheduleItems.students)"
+                                    :key="studentIndex">
+                                    <td>{{ studentIndex + 1 }}</td>
+                                    <td>{{ student.name }}</td>
+                                    <td style="text-align: center; color: red">
+                                        <input type="radio" :name="student._id" value="CM" v-model="student.absent">
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <input type="radio" :name="student._id" value="CP" v-model="student.absent">
+                                    </td>
+                                    <td style="text-align: center;">
+                                        <input type="radio" :name="student._id" value="KP" v-model="student.absent">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-3" style="text-align: center;">
+                        <!-- <button class="btn btn-primary mr-4"
+                            @click="updateAttendSchedule(scheduleItems._id, scheduleItems.students)">Lưu điểm
+                            danh</button> -->
+                        <button class="btn btn-danger" @click="showForm[scheduleItems._id] = false">Đóng</button>
+                    </div>
+                </div>
+            </div>
         </ul>
     </div>
 </template>
@@ -56,6 +112,7 @@ export default {
     data() {
         return {
             classesOfDay: [],
+            showForm: {},
         };
     },
     watch: {
@@ -72,12 +129,10 @@ export default {
                 this.classesOfDay = await ScheduleService.getClassesOfDayAndShift(this.buoi, this.thisWeek.date);
                 this.classesOfDay.sort((a, b) => (a.gioBatDau > b.gioBatDau) ? 1 : -1);
 
-                // Thêm trường isCommonRoom vào mỗi phần tử của classesOfDay với giá trị mặc định là false
                 this.classesOfDay.forEach(item => {
                     item.isCommonRoom = false;
                 });
 
-                // Kiểm tra nếu các phòng trùng nhau thì isCommonRoom thành true
                 this.classesOfDay.forEach((item, index) => {
                     const currentRoom = item.phong;
                     for (let i = index + 1; i < this.classesOfDay.length; i++) {
@@ -102,7 +157,6 @@ export default {
         getClassColor(className, date) {
             const grayColor = 'gray'; // hoặc bất kỳ màu xám nào bạn muốn
 
-            // Kiểm tra xem date có nằm trong khoảng từ ngayBatDau đến ngayKetThuc của một phần tử trong daysOff hay không
             const isDayOff = this.daysOff.some(dayOff => {
                 const ngayBatDau = moment(dayOff.ngayBatDau);
                 const ngayKetThuc = moment(dayOff.ngayKetThuc);
@@ -111,7 +165,6 @@ export default {
                 return currentDate.isBetween(ngayBatDau, ngayKetThuc, 'day', '[]');
             });
 
-            // Nếu date nằm trong khoảng ngày nghỉ của daysOff, trả về màu xám, ngược lại trả về màu của lớp học
             if (isDayOff) {
                 return grayColor;
             } else {
@@ -137,6 +190,29 @@ export default {
                 name: 'schedule.edit',
                 params: { id: scheduleId },
             });
+        },
+        sortStudents(students) {
+            students.sort((a, b) => {
+                const nameA = a.name.split(' ')
+                const lastWordPartA = nameA[nameA.length - 1]
+                const nameB = b.name.split(' ')
+                const lastWordPartB = nameB[nameB.length - 1]
+
+                return lastWordPartA.localeCompare(lastWordPartB);
+            });
+
+            return students;
+        },
+        isToday(dayOfClass) {
+            const d = new Date
+            const currentDate = d.toISOString().split('T')[0]
+
+            const classOfToDay = dayOfClass.split('T')[0]
+
+            return currentDate === classOfToDay
+        },
+        formattedDate(date) {
+            return moment(date).format('DD-MM-YYYY');
         },
     },
 };

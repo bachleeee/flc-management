@@ -29,31 +29,36 @@
                                 <div class="user-container" @mouseover="showDropdown" @mouseleave="hideDropdown">
                                     <div class="d-flex">
                                         <div class="btn-user mr-3">
-                                            <div class="icon-user">
-                                                <i class="fa fa-bell"></i>
+                                            <div class="icon-user" @click="showOptions">
+                                                <a href="#">
+                                                    <i class="far fa-bell"></i>
+                                                    <span v-if="this.countIsNotSeen > 0"
+                                                        class="notification-dot"></span>
+                                                </a>
                                             </div>
-                                            <div v-if="isDropdownVisible" class="dropdown-menu p-1"
-                                                style="width: 300px;">
-                                                <ul>
-                                                    <li v-for="(announcement, index) in myAnnounce" :key="index"
-                                                        class="dropdown-items m-2">
-                                                        <div class="d-flex">
-                                                            <img class="announce-image"
-                                                                src="../assets/img/user/avatar-defult.png" alt="">
-                                                            <div class="announce-items">
-                                                                <div class="announce-items-from">{{ announcement.from }}
+                                            <div v-if="showDropdownAnnounce" class="dropdown-container">
+                                                <div style="width: 300px;">
+                                                    <ul class="d-flex"
+                                                        style="flex-direction: column; background-color: #dedada;">
+                                                        <li style="background-color: white;"
+                                                            v-for="(announcement, index) in myAnnounce" :key="index"
+                                                            class="dropdown-items p-2 m-1">
+                                                            <div class="d-flex">
+                                                                <img class="announce-image"
+                                                                    src="../assets/img/user/avatar-defult.png" alt="">
+                                                                <div class="announce-items">
+                                                                    <div class="announce-items-from">{{
+                                                                        announcement.from }}</div>
+                                                                    <div class="announce-items-content">{{
+                                                                        announcement.noiDung }}</div>
+                                                                    <div class="announce-items-date">{{
+                                                                        formatDate(announcement.createAt) }}</div>
                                                                 </div>
-                                                                <div class="announce-items-content">{{
-                                                                    announcement.noiDung }}</div>
-                                                                <div class="announce-items-date">{{
-                                                                    formatDate(announcement.createAt) }}</div>
                                                             </div>
-                                                        </div>
-                                                        <hr>
-                                                    </li>
-                                                </ul>
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
-
                                         </div>
                                         <div class="btn-user">
                                             <div class="icon-user">
@@ -110,7 +115,10 @@ import AnnounceService from '@/service/announce.service.js';
 export default {
     data() {
         return {
-            myAnnounce: []
+            myAnnounce: [],
+            countIsNotSeen: 0,
+            showDropdownAnnounce: false,
+
         }
     },
     components: {
@@ -122,13 +130,28 @@ export default {
         },
     },
     methods: {
+        showOptions() {
+            this.showDropdownAnnounce = !this.showDropdownAnnounce;
+        },
         async getMyAnnouce() {
             try {
-                const user = Cookies.get('user');
-                this.myAnnounce = await AnnounceService.getMyAnnounce(user._id)
-                console.log(this.myAnnounce)
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (user) {
+                    this.myAnnounce = await AnnounceService.getMyAnnounce(user._id);
+                    if (this.myAnnounce) {
+                        this.myAnnounce.sort((a, b) => new Date(b.createAt) - new Date(a.createAt));
+
+                        let countIsNotSeen = 0;
+                        for (const announcement of this.myAnnounce) {
+                            if (!announcement.isSeen) {
+                                countIsNotSeen++;
+                            }
+                        }
+                        this.countIsNotSeen = countIsNotSeen;
+                    }
+                }
             } catch (error) {
-                console.error("Ko lay duoc thong bao")
+                console.error("Không thể lấy thông báo:", error);
             }
         },
         formatDate(dateString) {
@@ -140,8 +163,8 @@ export default {
         },
     },
     mounted() {
-        this.getMyAnnouce(); // Gọi hàm lấy thông báo khi component được mount lần đầu tiên
-        setInterval(this.getMyAnnouce, 10000); // Gọi lại hàm lấy thông báo mỗi 10 giây
+        this.getMyAnnouce();
+        setInterval(this.getMyAnnouce, 10000);
     }
 }
 </script>
@@ -264,5 +287,24 @@ a {
 .announce-items-date {
     font-size: 13px;
     font-weight: 400
+}
+
+.dropdown-container {
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 999;
+}
+
+.notification-dot {
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
+  display: inline-block;
+  position: absolute;
+
 }
 </style>

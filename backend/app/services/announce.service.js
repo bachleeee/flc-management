@@ -51,12 +51,11 @@ class AnnounceService {
       throw new Error(error);
     }
   }
-
   async findByUserId(id) {
     try {
       const announce = await this.databaseServices.announce
         .find({
-          toUser: { $elemMatch: { id: { $regex: new RegExp(id), $options: "i" } } }
+          toUser: { $in: [id] }
         })
         .toArray();
       return announce;
@@ -64,6 +63,7 @@ class AnnounceService {
       throw new Error(error);
     }
   }
+  
   
 
   async deleteOneAnnounce(announce_id) {

@@ -13,13 +13,13 @@ class GroupService {
     );
     return _group;
   }
-  
+
   async create(data) {
     const group = this.extractGroupData(data);
     const result = await this.databaseSetvices.class.findOneAndUpdate(
       group,
       {
-        $set: { siso: 0, students:[],teachers:[] },
+        $set: { siso: 0, students: [], teachers: [] },
       },
       {
         upsert: true,
@@ -34,7 +34,7 @@ class GroupService {
     const result = await this.databaseSetvices.schedule.findOneAndUpdate(
       group,
       {
-        $set: { },
+        $set: {},
       },
       {
         upsert: true,
@@ -62,7 +62,7 @@ class GroupService {
     } catch (error) {
       throw new Error(error);
     }
-}
+  }
   async findClassByTeacherId(teacherId) {
     try {
       const groups = await this.databaseSetvices.class.find({
@@ -72,7 +72,7 @@ class GroupService {
     } catch (error) {
       throw new Error(error);
     }
-}
+  }
 
   async findByCourseId(courseid) {
     try {
@@ -84,7 +84,7 @@ class GroupService {
       throw new Error(error);
     }
   }
-  
+
   async findByIdtoArray(data) {
     try {
       const group = await this.databaseSetvices.class.find({
@@ -95,7 +95,7 @@ class GroupService {
       throw new Error(error);
     }
   }
-  
+
   async findBycourseSlug(courseSlug) {
     try {
       const groups = await this.databaseSetvices.class
@@ -108,7 +108,7 @@ class GroupService {
       throw new Error(error);
     }
   }
-  
+
   async findBySlug(slug) {
     try {
       const group = await this.databaseSetvices.class.findOne({
@@ -119,7 +119,7 @@ class GroupService {
       throw new Error(error);
     }
   }
-  
+
   async findById(id) {
     try {
       const group = await this.databaseSetvices.class.findOne({
@@ -128,7 +128,7 @@ class GroupService {
       if (!group) {
         return null;
       }
-      return group; 
+      return group;
     } catch (error) {
       throw new Error(error);
     }
@@ -141,12 +141,12 @@ class GroupService {
       if (!group) {
         return null;
       }
-      return group; 
+      return group;
     } catch (error) {
       throw new Error(error);
     }
   }
-  
+
   async findByname(tenlop) {
     try {
       const group = await this.databaseSetvices.class.findOne({
@@ -159,7 +159,7 @@ class GroupService {
   }
 
   async update(id, updateGroup) {
-    const filter ={
+    const filter = {
       _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
     }
     const update = this.extractGroupData(updateGroup);
@@ -181,7 +181,7 @@ class GroupService {
   }
 
   async updateSchedule(id, updateGroup) {
-    const filter ={
+    const filter = {
       _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
     }
     const update = this.extractGroupData(updateGroup);
@@ -231,40 +231,40 @@ class GroupService {
       throw new Error(error);
     }
   }
-  
+
   async addToClass(classId, studentName, studentId) {
-  const filter = {
-    _id: new ObjectId(classId),
-  };
+    const filter = {
+      _id: new ObjectId(classId),
+    };
 
-  const update = {
-    $addToSet: {
-      students: { name: studentName, id: studentId }
-    },
-  };
+    const update = {
+      $addToSet: {
+        students: { name: studentName, id: studentId }
+      },
+    };
 
-  const options = {
-    returnDocument: 'after',
-  };
+    const options = {
+      returnDocument: 'after',
+    };
 
-  try {
-    let updatedClass = await this.databaseSetvices.class.findOneAndUpdate(
-      filter,
-      update,
-      options
-    );
+    try {
+      let updatedClass = await this.databaseSetvices.class.findOneAndUpdate(
+        filter,
+        update,
+        options
+      );
 
-    if (!updatedClass) {
-      throw new Error('Class not found');
+      if (!updatedClass) {
+        throw new Error('Class not found');
+      }
+
+      return updatedClass;
+    } catch (error) {
+      throw new Error(error);
     }
-
-    return updatedClass;
-  } catch (error) {
-    throw new Error(error);
   }
-}
 
-  
+
 }
 const databaseSetvices = require("../utils/mongodb.util");
 const groupService = new GroupService(databaseSetvices);

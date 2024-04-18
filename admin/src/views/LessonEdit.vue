@@ -7,7 +7,7 @@
             <div v-if="lesson" class="container mt-4 d-flex flex-column align-items-center">
               <h4>Hiệu chỉnh Bài học </h4>
               <LessonForm :lesson="lesson" @submit:lesson="updateLesson" @delete:lesson="deleteLesson"
-                :isRoleFieldDisabled="isRoleFieldDisabled" />
+                :isAddForm="isAddForm" :thisLessonId="thisLessonId"/>
               <p>{{ message }}</p>
             </div>
           </div>
@@ -20,6 +20,7 @@
 <script>
 import LessonForm from "@/components/LessonForm.vue";
 import LessonService from "@/services/lesson.service";
+import ExamService from "@/services/exam.service";
 
 export default {
   components: {
@@ -29,14 +30,19 @@ export default {
     return {
       lesson: null,
       message: "",
-      isRoleFieldDisabled: true,
       isAddForm: false,
+      thisLessonId: this.$route.params.id
     };
   },
   methods: {
     async getLesson() {
+      let exams = []
       try {
         this.lesson = await LessonService.getById(this.$route.params.id);
+        if(this.lesson) {
+          exams = await ExamService.getAllLessonExam(this.$route.params.id)
+          this.lesson.exams = exams;
+        }
       } catch (error) {
         console.log(error);
         this.$router.push({
@@ -51,7 +57,6 @@ export default {
     },
     async updateLesson(data) {
       try {
-        console.log("clicked")
         await LessonService.update(this.lesson._id, data);
         window.alert("Bài học được cập nhật thành công.");
       } catch (error) {

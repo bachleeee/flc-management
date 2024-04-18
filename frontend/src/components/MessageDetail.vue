@@ -81,7 +81,6 @@ export default {
                 const response = await MessageService.getAllMessage(this.group._id);
                 if (response) {
                     this.messages = response;
-                    console.log(this.messages)
                 }
             } catch (error) {
                 console.error('Error while fetching groups:', error);

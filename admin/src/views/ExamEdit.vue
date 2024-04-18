@@ -30,6 +30,7 @@ export default {
       exam: null,
       message: "",
       isRoleFieldDisabled: true,
+      thisLessonId: this.$route.params.id
     };
   },
   methods: {
@@ -50,9 +51,8 @@ export default {
     },
     async updateExam(data) {
       try {
-        console.log("clicked")
-        const result = await ExamService.update(this.exam._id, data);
-        console.log(result)
+        await ExamService.update(this.exam._id, data);
+        console.log(data)
         window.alert("Bài tập được cập nhật thành công.");
       } catch (error) {
         console.log(error);

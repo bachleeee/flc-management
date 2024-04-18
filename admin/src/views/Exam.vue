@@ -23,10 +23,10 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th scope="col" class="col-1">#</th>
-                                    <th scope="col" class="col-2">Nội dung</th>
+                                    <th scope="col" class="col-1">#</th>   
+                                    <th scope="col" class="col-5">Câu hỏi</th>
                                     <th scope="col" class="col-2">Loại</th>
-                                    <th scope="col" class="col-2">Câu hỏi</th>
+                                    <th scope="col" class="col-2">Đáp án</th>
                                     <th scope="col" class="col-2"></th>
                                 </tr>
                             </thead>

@@ -32,29 +32,13 @@ exports.findAll = async (req, res, next) => {
 
     if (userId) {
       documents = await announceService.findByUserId(userId);
-    } else {
+   return res.send(documents);
+   } else {
       documents = await announceService.findAll();
     }
   } catch (error) {
     next(new ApiError("An error occurred while retrieving announces", 500));
   }
-  return res.send(documents);
-};
-
-exports.findAll = async (req, res, next) => {
-  let documents = [];
-  try {
-    const { name } = req.query;
-
-    if (name) {
-      documents = await announceService.findByName(name);
-    } else {
-      documents = await announceService.findAll();
-    }
-  } catch (error) {
-    next(new ApiError("An error occurred while retrieving announces", 500));
-  }
-  return res.send(documents);
 };
 
 exports.findOneBySlug = async (req, res, next) => {

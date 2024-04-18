@@ -49,8 +49,8 @@ export default {
       }
     },
     toggleGroups(groupId) {
-  this.$data.showGroups[groupId] = !this.$data.showGroups[groupId];
-}
+      this.$data.showGroups[groupId] = !this.$data.showGroups[groupId];
+    }
 
   },
   mounted() {
@@ -81,7 +81,7 @@ export default {
 
 .group-container {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
 }
 
 .mess-detail {

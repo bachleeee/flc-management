@@ -82,7 +82,6 @@ export default {
         this.selectedOption[index] = "video";
       }
     },
-
     goToOption(option, lessonId) {
       if (option === "video") {
         this.$router.push({

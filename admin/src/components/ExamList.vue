@@ -1,14 +1,14 @@
 <template>
   <tr v-for="(exam, index) in exams" :key="exam._id" @click="updateActiveIndex(index)">
     <td class="col-1 table-items">{{ startIndex + index }}</td>
-    <td class="col-2 table-items">
-      {{ exam.title }}
+    <td class="col-5 table-items">
+      {{ exam.question }}
     </td>
     <td class="col-2 table-items">
       {{ exam.type }}
     </td>
     <td class="col-2 table-items">
-      {{ exam.question }}
+      {{ exam.correctOption }}
     </td>
   
     <td class="col-2">
